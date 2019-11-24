@@ -1,0 +1,329 @@
+## API-first Approach
+
+for building products
+
+创作中...
+
+author: dameng
+
+
+----
+
+## Design Fisrt
+
+then 
+
+## Code
+
+-----
+
+
+先看一下swagger官方对于APIFirst的阐述
+
+----
+
+An API-first approach means that for any given development project, your APIs are treated as “first-class citizens.” That everything about a project revolves around the idea that the end product will be consumed by mobile devices, and that APIs will be consumed by client applications. 
+
+----
+
+An API-first approach involves developing APIs that are consistent and reusable, which can be accomplished by using an API description language to establish a contract for how the API is supposed to behave.  
+
+----
+
+Establishing a contract involves spending more time thinking about the design of an API. It also often involves additional planning and collaboration with the stakeholders providing feedback on the design of an API before any code is written.
+
+----
+
+- API as first Citizens
+- consistent and reusable
+- using an description language
+- making a contract 
+- thinking more of design
+
+-----
+
+再让我们看一下TDD的一个例子
+
+----
+
+```python
+def test_calc_add_should_equal_to_x_plus_y(x, y):
+    calc = Calculator()
+    answer = calc.add(x, y)
+    assert answer == x + y
+```
+
+----
+
+```python
+class Calculator:
+    def add(self, x, y):
+        return x+y
+```
+
+----
+
+
+```python
+class Calculator:
+    def add(self, x, y):
+        return x+y
+
+def test_calc_add_should_equal_to_x_plus_y(x, y):
+    calc = Calculator()
+    answer = calc.add(x, y)
+    assert answer == x + y
+
+if __name__ == "__main__":
+    test_calc_add_should_equal_to_x_plus_y(10, 20)
+```
+
+----
+
+- Design first
+- Implementation follows
+
+
+-----
+
+How about the API ?
+
+----
+
+
+先设计一个简单的API
+
+
+----
+
+```
+Request:
+
+GET http://127.0.0.1/
+```
+
+----
+
+```
+Response:
+
+{
+    "data": "Hello World"
+}
+```
+
+----
+
+
+```python
+def index():
+    return {
+        'data': 'Hello World'
+    }
+
+def test_should_return_hello_world_when_access_index():
+    assert 'Hello World' == index().get('data')
+
+if __name__ == "__main__":
+    test_should_return_hello_world_when_access_index()
+```
+
+
+----
+
+```
+
+from flask import Flask, jsonify
+
+def index():
+    return {
+        'data': 'Hello World'
+    }
+
+def test_should_return_hello_world_when_access_index():
+    assert 'Hello World' == index().get('data')
+
+
+app = Flask(__name__)
+
+@app.route("/")
+def route_index():
+    result = index()
+    return jsonify(result)
+
+if __name__ == "__main__":
+    app.run()
+
+```
+
+----
+
+
+```
+需求 -> 开发 -> 测试
+
+需求 -> 测试 -> 开发 -> 测试 -> ...
+
+需求 -> 设计 -> 测试 -> 开发 -> 测试 -> ....
+```
+
+----
+
+- 自上而下的分工更加明确
+- 环节更明确， 局部并行更加容易
+
+-----
+
+![远古时代](./8.jpeg)
+
+----
+
+![远古时代](./9.jpeg)
+
+----
+
+![远古时代](./10.jpeg)
+
+----
+
+![远古时代](./11.jpeg)
+
+----
+
+## microservices 
+vs 
+## monolithic
+
+----
+
+
+当我们拆分单体应用为微服务时，如何避坑？
+
+----
+
+
+- Minimize Dependency Back to the Monolith
+- Split Sticky Capabilities Early
+- Decouple Vertically and Release the Data Early
+- Decouple What is Important to the Business and Changes Frequently
+- Decouple Capability and not Code
+- Go Macro First, then Micro
+- Migrate in Atomic Evolutionary Steps
+
+----
+
+除了这些准则，真正落地时都需要设计好模块与模块之间的API
+
+-----
+
+API的设计语言
+
+----
+
+## Swagger
+
+vs
+
+## RAML
+
+vs
+
+## BluePrint
+
+----
+
+让我们倒着来看
+
+----
+
+## BluePrint
+
+----
+
+<div style="max-height: 600px; overflow-y: scroll;">
+![](2019-11-24-23-45-47.png)
+</div>
+
+----
+
+## RAML
+
+----
+
+<div style="max-height: 600px; overflow-y: scroll;">
+![](2019-11-25-00-02-42.png)
+</div>
+
+----
+
+## OpenAPI(Swagger)
+
+----
+
+![](2019-11-25-00-08-59.png)
+
+----
+
+最终的赢家算是OpenAPI
+
+-----
+
+## OpenAPI
+
+----
+
+什么是OpenAPI？
+
+----
+
+OpenAPI Specification (formerly Swagger Specification) is an API description format for REST APIs. An OpenAPI file allows you to describe your entire API, including:
+
+- Available endpoints (/users) and operations on each endpoint (GET /users, POST /users)
+Operation parameters Input and output for each operation
+- Authentication methods
+- Contact information, license, terms of use and other information.
+
+API specifications can be written in YAML or JSON. The format is easy to learn and readable to both humans and machines. The complete OpenAPI Specification can be found on GitHub: OpenAPI 3.0 Specification
+
+----
+
+什么是Swagger？
+
+----
+
+Swagger is a set of open-source tools built around the OpenAPI Specification that can help you design, build, document and consume REST APIs. The major Swagger tools include:
+
+- Swagger Editor – browser-based editor where you can write OpenAPI specs.
+- Swagger UI – renders OpenAPI specs as interactive API documentation.
+- Swagger Codegen – generates server stubs and client libraries from an OpenAPI spec.
+
+----
+
+## Definition
+
+----
+
+- OpenAPI Document
+- Path Templating
+- Media Types (RFC6838)
+- HTTP Status Codes (RFC7231)
+
+----
+
+## Specification
+
+- Versions
+- Format
+- Document Structure
+- Data Types
+- Rich Text Formatting
+- Relative References in URLs
+- Schema
+- Specification Extensions
+- Security Filtering
+
+-----
+
+创作中。。。
+
+

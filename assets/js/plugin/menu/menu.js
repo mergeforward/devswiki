@@ -34,6 +34,7 @@ var RevealMenu = window.RevealMenu || (function(){
 					{ name: 'White', theme: 'css/theme/white.css' },
 					{ name: 'League', theme: 'css/theme/league.css' },
 					{ name: 'Sky', theme: 'css/theme/sky.css' },
+					{ name: 'Swagger', theme: 'css/theme/swagger.css' },
 					{ name: 'Beige', theme: 'css/theme/beige.css' },
 					{ name: 'Simple', theme: 'css/theme/simple.css' },
 					{ name: 'Serif', theme: 'css/theme/serif.css' },
