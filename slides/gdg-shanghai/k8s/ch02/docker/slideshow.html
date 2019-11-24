@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+	<head>
+        <base target="_parent" />
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<meta name="author" content="">
+		<title>Introduction</title>
+		<link rel="stylesheet" href="/assets/css/reveal.css">
+ 		<link rel="stylesheet" href="/assets/css/tooltip.css">
+		<link rel="stylesheet" href="/assets/css/theme/sky.css" id="theme">
+        <link rel="stylesheet" href="/assets/css/font-awesome.min.css">
+        <link rel="stylesheet" href="/assets/css/customizations.css">
+ 		<link rel="stylesheet" href="/assets/css/slide-customizations.css">
+   	<!-- Code syntax highlighting -->
+		<link rel="stylesheet" href="/assets/css/zenburn.css">
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+		<script src="/assets/js/extra/raphael.min.js"></script>
+    <script src="/assets/js/extra/flowchart.min.js"></script>
+    <script src="/assets/js/extra/flowchart-options.js"></script>
+    <script src="/assets/js/extra/jsmind.js"></script>
+    <script src="/assets/js/extra/jsmind-options.js"></script>
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? '/assets/css/print/pdf.css' : '/assets/css/print/paper.css';
+			document.getElementsByTagName('head')[0].appendChild(link);
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+                <section data-markdown="./slides.mdtxt"
+                         data-separator="^\n-----\n$"
+                         data-separator-vertical="^\n----\n$">
+                </section>
+			</div>
+		</div>
+
+		<script src="/assets/js/head.min.js"></script>
+		<script src="/assets/js/reveal.min.js"></script>
+
+		<script>
+			// More info https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+                controls: true,
+                progress: true,
+				history: true,
+                center: true,
+
+                transition: 'slide', // 'convex'
+                slideNumber: 'c/t',
+                embedded: true,
+
+				// More info https://github.com/hakimel/reveal.js#dependencies
+                // Also see https://theno.github.io/revealjs_template/
+				dependencies: [
+          { src: '/assets/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: '/assets/js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: '/assets/js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: '/assets/js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+          { src: '/assets/js/plugin/zoom-js/zoom.js' },
+					{ src: '/assets/js/plugin/notes/notes.js', async: true },
+          { src: '/assets/js/plugin/menu/menu.js' },
+          { src: '/assets/js/plugin/title-footer/title-footer.js', async: true, callback: function() { title_footer.initialize(); } },
+          { src: '/assets/js/plugin/toc-progress/toc-progress.js', async: true, callback: function() { toc_progress.initialize(); toc_progress.create(); } },
+          { src: '/assets/js/plugin/flowchart-js/flowchart.js', async: false },
+          { src: '/assets/js/plugin/quizz/quizz.js', async: false },
+          { src: '/assets/js/plugin/jsmind/jsmind.js', async: false },
+				],
+        // plugin menu, cf. https://github.com/denehyg/reveal.js-menu#configuration
+        menu: {
+            side: 'left',
+            numbers: false,
+            titleSelector: 'h1, h2, h3, h4, h5, h6',
+            hideMissingTitles: false,
+            markers: false,
+            custom: false,
+            themes: [
+                { name: 'Black', theme: '/assets/css/theme/black.css' },
+                { name: 'White', theme: '/assets/css/theme/white.css' },
+                { name: 'League', theme: '/assets/css/theme/league.css' },
+                { name: 'Sky', theme: '/assets/css/theme/sky.css' },
+                { name: 'Beige', theme: '/assets/css/theme/beige.css' },
+                { name: 'Simple', theme: '/assets/css/theme/simple.css' },
+                { name: 'Serif', theme: '/assets/css/theme/serif.css' },
+                { name: 'Blood', theme: '/assets/css/theme/blood.css' },
+                { name: 'Night', theme: '/assets/css/theme/night.css' },
+                { name: 'Moon', theme: '/assets/css/theme/moon.css' },
+                { name: 'Solarized', theme: '/assets/css/theme/solarized.css' }
+            ],
+            transitions: true,
+            openButton: true,
+            openSlideNumber: true,
+            keyboard: true
+        }
+			});
+		</script>
+	</body>
+</html>

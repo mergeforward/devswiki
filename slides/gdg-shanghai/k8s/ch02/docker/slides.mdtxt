@@ -1,0 +1,1760 @@
+# Docker入门
+# 第二课
+
+Author: Makefile君（dameng）
+
+-----
+
+## 课程大纲
+
+- 前情回顾
+- docker三剑客
+  - compose
+  - engine
+  - swarm
+
+
+----
+
+- 与docker整合
+  - swarm
+  - node
+  - stack
+  - service
+- python web开发指南
+
+-----
+
+
+Previously on Docker Intro .....
+
+----
+
+![](2019-07-25-20-03-58.png)
+
+----
+
+- 计算
+- 存储
+- 网络
+
+----
+
+- container
+- volume
+- network
+
+----
+
+
+- Docker 背景介绍
+- Docker特点与架构
+- Docker的安装
+- 镜像仓库的使用
+- Dockerfile的编写
+
+----
+
+- 实战： 2048
+- 实战： 连接redis的flask程序 
+
+----
+
+
+
+```bash
+docker run -d -P daocloud.io/daocloud/dao-2048
+```
+
+----
+
+app.py
+
+```python
+from flask import Flask
+from redis import Redis, RedisError
+import os
+import socket
+
+# Connect to Redis
+redis = Redis(host="redis", db=0, socket_connect_timeout=2, socket_timeout=2)
+
+app = Flask(__name__)
+
+@app.route("/")
+def hello():
+    try:
+        visits = redis.incr("counter")
+    except RedisError:
+        visits = "<i>cannot connect to Redis, counter disabled</i>"
+
+    html = "<h3>Hello {name}!</h3>" \
+           "<b>Hostname:</b> {hostname}<br/>" \
+           "<b>Visits:</b> {visits}"
+    return html.format(name=os.getenv("NAME", "world"), hostname=socket.gethostname(), visits=visits)
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=5000)
+```
+
+----
+
+```Dockerfile
+
+FROM python:3.7-slim
+
+WORKDIR /app
+
+COPY . /app
+
+RUN pip install flask redis -i https://mirrors.aliyun.com/pypi/simple  --trusted-host mirrors.aliyun.com 
+EXPOSE 5000
+ENV NAME World
+
+CMD ["python", "app.py"]
+
+```
+
+----
+
+
+sources.list
+```
+deb http://mirrors.163.com/debian/ buster main non-free contrib
+deb http://mirrors.163.com/debian/ buster-updates main non-free contrib
+deb http://mirrors.163.com/debian/ buster-backports main non-free contrib
+deb-src http://mirrors.163.com/debian/ buster main non-free contrib
+deb-src http://mirrors.163.com/debian/ buster-updates main non-free contrib
+deb-src http://mirrors.163.com/debian/ buster-backports main non-free contrib
+deb http://mirrors.163.com/debian-security/ buster/updates main non-free contrib
+deb-src http://mirrors.163.com/debian-security/ buster/updates main non-free contrib
+```
+
+----
+
+```bash
+docker build -t friendlyhello:v3 . 
+docker network create -d bridge mynet
+docker run  --rm --name flask -p 5000:5000 --net mynet friendlyhello:v3
+docker run  --rm --name redis --net mynet redis
+```
+
+-----
+
+
+安装时遇到的问题
+
+
+修改/etc/docker/daemon.json
+
+```
+{
+  "registry-mirrors": [
+    "https://dockerhub.azk8s.cn",
+    "https://reg-mirror.qiniu.com"
+  ]
+}
+```
+
+-----
+
+## 回归正题
+
+----
+
+## docker 三剑客
+
+- docker compose
+- docker machine
+- docker swarm
+
+----
+
+### docker compose
+
+----
+
+使用docker来定义多容器应用的工具
+
+----
+
+docker 自带的容器配置工具
+
+----
+
+用一个yaml文件来管理多个容器的工具
+
+----
+
+### docker machine 
+
+----
+
+docker安装器
+
+----
+
+一条命令将docker安装在不同的节点上
+
+----
+
+简化不同节点上的docker的管理
+
+----
+
+### docker swarm
+
+----
+
+docker 自带的 集群管理工具
+
+----
+
+将多个docker host挂载一个docker api后面
+
+----
+
+管理多个主机，并指派指定的容器
+
+-----
+
+下面正式开始
+
+-----
+
+### docker compose
+
+
+----
+
+history
+
+源自于一个名叫fig的项目，被收购后就改成docker compose了
+
+----
+
+docker-compose的 安装
+
+----
+
+```
+pip install -U docker-compose
+```
+
+```
+curl -L https://github.com/docker/compose/releases/download/1.4.0/\
+docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+```
+
+----
+
+docker-compose的命令学习
+
+----
+
+和docker类似，依旧从version和help入手
+
+----
+
+```
+docker-compose version
+```
+
+----
+
+```
+docker-compose version 1.23.1, build b02f1306
+docker-py version: 3.5.0
+CPython version: 3.6.7
+OpenSSL version: OpenSSL 1.1.0f  25 May 2017
+```
+
+----
+
+```
+docker-compose help
+```
+
+----
+
+```bash
+Usage:
+  docker-compose [-f <arg>...] [options] [COMMAND] [ARGS...]
+  docker-compose -h|--help
+```
+
+----
+
+```
+Options:
+  -f, --file FILE             Specify an alternate compose file
+                              (default: docker-compose.yml)
+  -p, --project-name NAME     Specify an alternate project name
+                              (default: directory name)
+  --verbose                   Show more output
+  --log-level LEVEL           Set log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+  --no-ansi                   Do not print ANSI control characters
+  -v, --version               Print version and exit
+  -H, --host HOST             Daemon socket to connect to
+
+  --tls                       Use TLS; implied by --tlsverify
+  --tlscacert CA_PATH         Trust certs signed only by this CA
+  --tlscert CLIENT_CERT_PATH  Path to TLS certificate file
+  --tlskey TLS_KEY_PATH       Path to TLS key file
+  --tlsverify                 Use TLS and verify the remote
+  --skip-hostname-check       Don't check the daemon's hostname against the
+                              name specified in the client certificate
+  --project-directory PATH    Specify an alternate working directory
+                              (default: the path of the Compose file)
+  --compatibility             If set, Compose will attempt to convert deploy
+                              keys in v3 files to their non-Swarm equivalent
+```
+
+----
+
+```
+Commands:
+  build              Build or rebuild services
+  bundle             Generate a Docker bundle from the Compose file
+  config             Validate and view the Compose file
+  create             Create services
+  down               Stop and remove containers, networks, images, and volumes
+  events             Receive real time events from containers
+  exec               Execute a command in a running container
+  help               Get help on a command
+  images             List images
+  kill               Kill containers
+  logs               View output from containers
+  pause              Pause services
+  port               Print the public port for a port binding
+  ps                 List containers
+  pull               Pull service images
+  push               Push service images
+  restart            Restart services
+  rm                 Remove stopped containers
+  run                Run a one-off command
+  scale              Set number of containers for a service
+  start              Start services
+  stop               Stop services
+  top                Display the running processes
+  unpause            Unpause services
+  up                 Create and start containers
+  version            Show the Docker-Compose version information
+```
+
+----
+
+docker-compose 实际指令使用
+
+----
+
+构建镜像
+
+```bash
+docker-compose build
+```
+
+----
+
+启动
+
+```bash
+docker-compose -f docker-compose.yml up -d
+```
+
+----
+
+```bash
+Compose does not use swarm mode to deploy services to multiple nodes in a swarm. All containers will be scheduled on the current node.
+
+To deploy your application across the swarm, use `docker **stack** deploy`.
+
+Creating network "c01_default" with the default driver
+Creating myapp ... done
+Creating web   ... done
+```
+
+----
+
+终止
+```bash
+docker-compose -f docker-compose.yml down
+```
+
+----
+
+```bash
+Stopping web   ... done
+Stopping myapp ... done
+Removing web   ... done
+Removing myapp ... done
+Removing network c01_default
+```
+
+----
+
+执行
+```bash
+docker-compose exec myapp bash
+```
+
+----
+
+查看
+```bash
+docker-compose ps
+```
+注意ps是要指定compose文件，默认当前文件夹内docker-compose.yaml
+
+----
+
+
+注意:
+
+WARNING: The Docker Engine you're using is running in swarm mode.
+
+Compose does not use swarm mode to deploy services to multiple nodes in a swarm. All containers will be scheduled on the current node.
+
+To deploy your application across the swarm, use `docker stack deploy`.
+
+-----
+
+Try it out (1)
+
+----
+
+- `app.py`
+- `Dockerfile`
+- `sources.list`
+- `docker-compose.yaml`
+
+----
+
+app.py
+
+```
+from flask import Flask
+from redis import Redis, RedisError
+import os
+import socket
+
+# Connect to Redis
+redis = Redis(host="redis", db=0, socket_connect_timeout=2, socket_timeout=2)
+
+app = Flask(__name__)
+
+@app.route("/")
+def hello():
+    try:
+        visits = redis.incr("counter")
+    except RedisError:
+        visits = "<i>cannot connect to Redis, counter disabled</i>"
+
+    html = "<h3>Hello {name}!</h3>" \
+           "<b>Hostname:</b> {hostname}<br/>" \
+           "<b>Visits:</b> {visits}"
+    return html.format(name=os.getenv("NAME", "world"), hostname=socket.gethostname(), visits=visits)
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=5000)
+```
+
+----
+
+Dockerfile
+
+```bash
+FROM python:3.7-slim
+
+WORKDIR /app
+
+COPY . /app
+
+COPY sources.list /etc/apt/
+RUN pip install flask redis -i https://mirrors.aliyun.com/pypi/simple  --trusted-host mirrors.aliyun.com 
+EXPOSE 5000
+ENV NAME World
+
+CMD ["python", "app.py"]
+
+```
+
+----
+
+sources.list
+
+```
+deb http://mirrors.163.com/debian/ buster main non-free contrib
+deb http://mirrors.163.com/debian/ buster-updates main non-free contrib
+deb http://mirrors.163.com/debian/ buster-backports main non-free contrib
+deb-src http://mirrors.163.com/debian/ buster main non-free contrib
+deb-src http://mirrors.163.com/debian/ buster-updates main non-free contrib
+deb-src http://mirrors.163.com/debian/ buster-backports main non-free contrib
+deb http://mirrors.163.com/debian-security/ buster/updates main non-free contrib
+deb-src http://mirrors.163.com/debian-security/ buster/updates main non-free contrib
+```
+
+----
+
+docker-compose.yaml
+
+```
+version: "3"
+
+services:
+  myapp:
+    # build: .
+    image: friendlyhello:v2
+    container_name: myapp
+    ports:
+      - "5000:5000"
+    environment:
+      NAME: World
+
+  redis:
+    image: redis
+    container_name: web
+```
+
+-----
+
+### docker machine
+
+----
+
+先回顾一下docker的架构
+
+----
+
+![](2019-07-22-19-36-22.png)
+
+----
+
+再看看Machine要解决的问题
+
+----
+
+![](2019-08-06-21-06-10.png)
+
+----
+
+#### 安装
+
+```bash
+base=https://github.com/docker/machine/releases/download/v0.16.0 &&
+  curl -L $base/docker-machine-$(uname -s)-$(uname -m) >/tmp/docker-machine &&
+  sudo install /tmp/docker-machine /usr/local/bin/docker-machine
+```
+
+
+----
+
+依旧从version和help开始
+
+----
+
+```bash
+docker-machine version
+```
+
+----
+
+```
+docker-machine version 0.16.0, build 702c267f
+```
+
+----
+
+
+```
+docker-machine help
+```
+
+----
+
+
+```bash
+Usage: docker-machine [OPTIONS] COMMAND [arg...]
+Create and manage machines running Docker.
+```
+
+----
+
+```
+Version: 0.16.0, build 702c267f
+
+Author:
+  Docker Machine Contributors - <https://github.com/docker/machine>
+```
+
+----
+
+```
+Options:
+  --debug, -D						Enable debug mode
+  --storage-path, -s "/home/dameng/.docker/machine"	Configures storage path [$MACHINE_STORAGE_PATH]
+  --tls-ca-cert 					CA to verify remotes against [$MACHINE_TLS_CA_CERT]
+  --tls-ca-key 						Private key to generate certificates [$MACHINE_TLS_CA_KEY]
+  --tls-client-cert 					Client cert to use for TLS [$MACHINE_TLS_CLIENT_CERT]
+  --tls-client-key 					Private key used in client TLS auth [$MACHINE_TLS_CLIENT_KEY]
+  --github-api-token 					Token to use for requests to the Github API [$MACHINE_GITHUB_API_TOKEN]
+  --native-ssh						Use the native (Go-based) SSH implementation. [$MACHINE_NATIVE_SSH]
+  --bugsnag-api-token 					BugSnag API token for crash reporting [$MACHINE_BUGSNAG_API_TOKEN]
+  --help, -h						show help
+  --version, -v						print the version
+```
+
+----
+
+```
+Commands:
+  active		Print which machine is active
+  config		Print the connection config for machine
+  create		Create a machine
+  env			Display the commands to set up the environment for the Docker client
+  inspect		Inspect information about a machine
+  ip			Get the IP address of a machine
+  kill			Kill a machine
+  ls			List machines
+  provision		Re-provision existing machines
+  regenerate-certs	Regenerate TLS Certificates for a machine
+  restart		Restart a machine
+  rm			Remove a machine
+  ssh			Log into or run a command on a machine with SSH.
+  scp			Copy files between machines
+  mount			Mount or unmount a directory from a machine with SSHFS.
+  start			Start a machine
+  status		Get the status of a machine
+  stop			Stop a machine
+  upgrade		Upgrade a machine to the latest version of Docker
+  url			Get the URL of a machine
+  version		Show the Docker Machine version or a machine docker version
+  help			Shows a list of commands or help for one command
+```
+
+----
+
+
+
+具体的使用
+
+
+----
+
+查看当前有哪些machine
+
+```bash
+docker-machine ls
+```
+
+```
+NAME   ACTIVE   DRIVER   STATE   URL   SWARM   DOCKER   ERRORS
+```
+
+----
+
+没有？ 那就安装一个
+
+----
+
+
+```bash
+docker-machine create --driver virtualbox default
+```
+
+----
+
+
+然后，因为网络，可能有漫长的等待
+
+----
+
+```
+(default) No default Boot2Docker ISO found locally, downloading the latest release...
+(default) Latest release for github.com/boot2docker/boot2docker is v19.03.1
+(default) Downloading /home/dameng/.docker/machine/cache/boot2docker.iso from https://github.com/boot2d
+.....
+<这一段等的花儿都谢了...>
+.....
+(default) 0%....10%....20%....30%....40%....50%....60%....70%....80%....90%....100%
+Creating machine...
+(default) Copying /home/dameng/.docker/machine/cache/boot2docker.iso to /home/dameng/.docker/machine/machines/default/boot2docker.iso...
+(default) Creating VirtualBox VM...
+(default) Creating SSH key...
+(default) Starting the VM...
+(default) Check network to re-create if needed...
+(default) Found a new host-only adapter: "vboxnet1"
+(default) Waiting for an IP...
+Waiting for machine to be running, this may take a few minutes...
+Detecting operating system of created instance...
+Waiting for SSH to be available...
+Detecting the provisioner...
+Provisioning with boot2docker...
+Copying certs to the local machine directory...
+Copying certs to the remote machine...
+Setting Docker configuration on the remote daemon...
+Checking connection to Docker...
+Docker is up and running!
+To see how to connect your Docker Client to the Docker Engine running on this virtual machine, run: docker-machine env default
+```
+
+----
+
+
+这个default就是一个虚拟机
+
+----
+
+再次运行
+
+```bash
+docker-machine ls
+```
+
+----
+
+```
+NAME             ACTIVE   DRIVER       STATE     URL                         SWARM   DOCKER        ERRORS 
+default          -        virtualbox   Running   tcp://192.168.99.100:2376           v19.03.1    
+```
+
+----
+
+
+- 使用boot2docker
+- 基于tiny core linux
+- 小
+- 但是什么都没有
+  
+
+----
+
+运行后就比较尴尬了
+
+```
+docker-machine ssh default
+```
+
+----
+
+
+什么都没有...
+
+-----
+
+
+try it out (2)
+
+----
+
+安装虚拟机
+
+模拟多节点环境
+
+----
+
+安装个alpine吧
+
+![](2019-08-06-22-27-18.png)
+
+----
+
+export SWAP_SIZE=0
+....省略....
+
+-----
+
+try it out (3)[非要求]
+
+----
+
+
+将alpine加入docker machine集群
+
+----
+
+假设有安装好alpine的节点
+- 192.168.99.200
+- 192.168.99.201
+- 192.168.99.202
+
+----
+
+下面的动作需要在
+节点 00, 01, 02 重复三次
+同时需要按需替换对应的ip于节点名称
+
+----
+
+
+使用docker-machine创建
+
+```
+docker-machine create --driver generic --generic-ip-address=192.168.99.200 alpine-machine  (failed!)
+```
+
+
+----
+
+这个会创建`~/.docker/machine/machines/alpine-00`文件夹，并生成对应的`config.json`
+
+
+----
+
+
+复制证书
+
+```
+cp ~/.docker/machine/certs/ca.pem ~/.docker/machine/machines/alpine-00/ca.pem
+cp ~/.docker/machine/certs/key.pem ~/.docker/machine/machines/alpine-00/key.pem
+cp ~/.docker/machine/certs/cert.pem ~/.docker/machine/machines/alpine-00/cert.pem
+```
+
+----
+
+生成server的key
+
+```
+cd ~/.docker/machine/machines/alpine-00
+openssl genrsa -out server-key.pem 4096
+openssl req -subj "/CN=alpine-machine" -sha256 -new -key server-key.pem -out server.csr
+openssl x509 -req -days 3650 -in server.csr -CA ~/.docker/machine/certs/ca.pem -CAkey ~/.docker/machine/certs/ca-key.pem -out server.pem
+# replace x.x.x.x by machine ip
+echo subjectAltName = IP:192.168.99.200,IP:192.168.99.201,IP:192.168.99.202,IP:127.0.0.1 > extfile.cnf
+echo extendedKeyUsage = serverAuth >> extfile.cnf
+openssl x509 -req -days 3650 -sha256 -in server.csr -CA ~/.docker/machine/certs/ca.pem -CAkey ~/.docker/machine/certs/ca-key.pem -CAcreateserial -out server.pem -extfile extfile.cnf
+rm extfile.cnf server.csr
+```
+
+----
+
+
+复制证书和key到节点
+
+```
+docker-machine scp ~/.docker/machine/machines/alpine-00/ca.pem alpine-00:/etc/docker/ca.pem
+docker-machine scp ~/.docker/machine/machines/alpine-00/server.pem alpine-00:/etc/docker/server.pem
+docker-machine scp ~/.docker/machine/machines/alpine-00/server-key.pem alpine-00:/etc/docker/server-key.pem
+```
+
+----
+
+配置启动项目
+
+```
+docker-machine ssh alpine-00 "
+echo \"
+DOCKER_OPTS='
+-H tcp://0.0.0.0:2376
+-H unix:///var/run/docker.sock
+--tlsverify
+--tlscacert /etc/docker/ca.pem
+--tlscert /etc/docker/server.pem
+--tlskey /etc/docker/server-key.pem
+--label provider=generic
+'
+\" > /etc/conf.d/docker
+"
+docker-machine ssh alpine-00 service docker restart
+```
+
+----
+
+
+```
+eval $(docker-machine env alpine-00)
+docker run --rm -d -p 80:80 nginx
+curl 192.168.99.200 
+```
+
+-----
+
+回顾下 docker-machine 的指令
+
+----
+
+创建machine
+```
+docker-machine create [OPTIONS] [arg...]
+```
+
+```
+docker-machine create --driver virtualbox MACHINE-NAME
+```
+
+```
+docker-machine create --driver generic --generic-ip-address=IP-ADDRESS MACHINE-NAME
+```
+
+----
+
+移除machine
+```
+docker-machine rm MACHINE-NAME
+```
+
+----
+
+ssh登录
+```
+docker-machine ssh MACHINE-NAME
+```
+
+----
+
+环境变量
+```
+docker-machine env MACHINE-NAME
+```
+
+```
+eval $(docker-machine env MACHINE-NAME)
+```
+
+----
+
+审查
+
+```
+docker-machine inspect MACHINE-NAME
+```
+
+----
+
+罗列
+```
+docker-machine ls 
+```
+
+----
+
+状态
+
+```
+docker-machine status MACHINE-NAME
+```
+
+----
+
+启动
+```
+docker-machine start MACHINE-NAME
+```
+
+----
+
+终止
+
+```
+docker-machine stop MACHINE-NAME
+```
+
+----
+
+重启
+
+```
+docker-machine restart MACHINE-NAME
+```
+
+-----
+
+
+docker swarm
+
+----
+
+![](2019-08-10-00-47-05.png)
+
+----
+
+引深：vxlan网络
+
+----
+
+![](2019-08-10-20-48-53.png)
+
+----
+
+![](2019-08-10-20-49-41.png)
+
+-----
+
+swarm早期版本
+
+- 配置复杂
+- 通过docker来启动的容器
+- 需要修改配置项
+
+----
+
+启动项DOCKER_OPT中添加
+
+```
+-H tcp://0.0.0.0:2375
+```
+
+----
+
+
+创建集群
+
+```
+docker run --rm swarm create
+```
+
+----
+
+manager节点
+
+```
+docker run -d -p 8888:2375 swarm manage token://mfb4fb3a8767835d799ce429fb4d7c4a
+```
+
+----
+
+worker 节点
+
+```
+docker run -d swarm join --addr=192.168.99.200:2375 token://mfb4fb3a8767835d799ce429fb4d7c4a
+```
+
+----
+
+罗列
+
+```
+docker run -d swarm list token://mfb4fb3a8767835d799ce429fb4d7c4a
+```
+
+----
+
+运行
+
+```
+docker -H 127.0.0.1:8888 run -d -p 10022:22 --name test friendlyhello:v3
+```
+
+-----
+
+### 新的篇章
+
+与Docker的整合
+
+
+-----
+
+和集群相关的对象
+
+- swarm 
+- node
+- stack
+- service
+
+-----
+
+### swarm
+
+----
+
+和前面的swarm直接对应，但是不同的是旧版的swarm会独立启动一个容器来运行swarm组件。而于docker整合后的swarm则是用户无感知的。
+
+----
+
+```
+docker swarm help
+```
+
+```
+Usage:	docker swarm COMMAND
+
+Manage Swarm
+
+Commands:
+  ca          Display and rotate the root CA
+  init        Initialize a swarm
+  join        Join a swarm as a node and/or manager
+  join-token  Manage join tokens
+  leave       Leave the swarm
+  unlock      Unlock swarm
+  unlock-key  Manage the unlock key
+  update      Update the swarm
+
+Run 'docker swarm COMMAND --help' for more information on a command.
+```
+
+----
+
+创建swarm集群并启动manager
+
+```
+docker swarm init --listen-addr 192.168.99.200:2377 --advertise-addr 192.168.99.200
+```
+
+此时会输出加入swarm集群的方式
+
+```
+docker swarm join --token SWMTKN-1-0nbwp5l3wsrtvf1hhrzf7dxbabpvitzo2ssyjqhnymg7d2ypzr-b1v1t5lnabvr4ojw9xe7eugkk 192.168.99.200:2377
+```
+
+----
+
+如果没记住
+
+```
+docker swarm join-token worker
+```
+
+依旧会输出
+```
+docker swarm join --token SWMTKN-1-0nbwp5l3wsrtvf1hhrzf7dxbabpvitzo2ssyjqhnymg7d2ypzr-b1v1t5lnabvr4ojw9xe7eugkk 192.168.99.200:2377
+```
+
+----
+
+在另一台节点上执行
+```
+docker swarm join --token SWMTKN-1-0nbwp5l3wsrtvf1hhrzf7dxbabpvitzo2ssyjqhnymg7d2ypzr-b1v1t5lnabvr4ojw9xe7eugkk 192.168.99.200:2377
+```
+
+-----
+
+### Node
+
+----
+
+```
+docker node help
+```
+
+----
+
+```
+Usage:	docker node COMMAND
+
+Manage Swarm nodes
+
+Commands:
+  demote      Demote one or more nodes from manager in the swarm
+  inspect     Display detailed information on one or more nodes
+  ls          List nodes in the swarm
+  promote     Promote one or more nodes to manager in the swarm
+  ps          List tasks running on one or more nodes, defaults to current node
+  rm          Remove one or more nodes from the swarm
+  update      Update a node
+
+Run 'docker node COMMAND --help' for more information on a command.
+```
+
+----
+
+可以看到node对象跟swarm有着很密切的联系
+
+----
+
+使用ls命令查看节点信息
+
+```
+docker node ls
+```
+
+```
+ID                            HOSTNAME            STATUS              AVAILABILITY        MANAGER STATUS      ENGINE VERSION
+v1oo73vt40hnjivnhnw78po4u *   dameng-00           Ready               Active              Leader              18.09.8-ce
+yrz7drszt4hq5j8c8rbhoexqc     dameng-01           Ready               Active                                  18.09.8-ce
+```
+
+-----
+
+### Stack
+
+----
+
+升级版的Compose！
+
+----
+
+```
+docker stack help
+```
+
+```
+Usage:	docker stack [OPTIONS] COMMAND
+
+Manage Docker stacks
+
+Options:
+      --kubeconfig string     Kubernetes config file
+      --orchestrator string   Orchestrator to use (swarm|kubernetes|all)
+
+Commands:
+  deploy      Deploy a new stack or update an existing stack
+  ls          List stacks
+  ps          List the tasks in the stack
+  rm          Remove one or more stacks
+  services    List the services in the stack
+```
+
+----
+
+部署
+
+
+```
+docker-compose -f CONFIG-YAML up
+```
+
+
+```
+docker stack deploy -c CONFIG-YAML STACK-NAME
+```
+
+----
+
+查看
+
+```
+docker-compose ps
+docker ps
+```
+
+```
+docker node ls
+docker stack ls
+docker service ls
+```
+
+----
+
+终止
+
+```
+docker-compose -f CONFIG-YAML down
+```
+
+```
+docker stack rm STACK-NAME
+```
+
+----
+
+网络
+
+单机 vs 跨节点
+
+注意: docker stack 默认使用的是swarm，但也是可以对接k8s的
+
+----
+
+[stack yaml](https://docs.docker.com/v17.12/docker-cloud/apps/stack-yaml-reference/)
+
+-----
+
+### Service
+
+----
+
+
+```
+docker service help
+```
+
+----
+
+```
+Usage:	docker service COMMAND
+
+Manage services
+
+Commands:
+  create      Create a new service
+  inspect     Display detailed information on one or more services
+  logs        Fetch the logs of a service or task
+  ls          List services
+  ps          List the tasks of one or more services
+  rm          Remove one or more services
+  rollback    Revert changes to a service's configuration
+  scale       Scale one or multiple replicated services
+  update      Update a service
+
+Run 'docker service COMMAND --help' for more information on a command.
+```
+
+----
+
+
+```
+docker service ls
+```
+
+
+```
+ID                  NAME                MODE                REPLICAS            IMAGE               PORTS
+oyiesfc3biiq        myapp_myapp         replicated          1/1                 friendlyhello:v3    *:5000->5000/tcp
+xrk7kska1z76        myapp_redis         replicated          1/1                 redis:latest  
+```
+
+----
+
+扩容
+
+```
+docker service scale myapp_myapp=2 
+```
+
+----
+
+```
+ID                  NAME                MODE                REPLICAS            IMAGE               PORTS
+oyiesfc3biiq        myapp_myapp         replicated          2/2                 friendlyhello:v3    *:5000->5000/tcp
+xrk7kska1z76        myapp_redis         replicated          1/1                 redis:latest 
+```
+
+-----
+
+
+try it out (4)
+
+----
+
+
+same friendlyhello on swarm
+
+-----
+
+
+try it out (5)
+
+----
+
+postgres on swarm
+
+-----
+
+```yaml
+version: '3.1'
+
+services:
+
+  db:
+    image: postgres
+    command: postgres -c 'shared_buffers=512MB' -c 'max_connections=2000'
+    restart: always
+    environment:
+      POSTGRES_USER: dameng
+      POSTGRES_PASSWORD: pythonic
+    ports:
+      - 5432:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8998:8080
+
+volumes:
+  pgdata: 
+
+```
+
+-----
+
+python 实践
+
+-----
+
+基础的语法和结构
+
+----
+
+```python
+x = 60
+
+if x>=90:
+    print('good')
+elif x>=60:
+    print('okay')
+else:
+    print('failed')
+```
+
+----
+
+```python
+for i in range(10):
+    print(i)
+```
+
+----
+
+```python
+def greeting(name):
+    print(f'hello {name}')
+```
+
+----
+
+```python
+a = [1,2,3]
+b = {'hello': 'world'}
+```
+
+----
+
+```python
+a.append(4)
+b['nihao'] = 'shijie'
+```
+
+----
+
+```python
+for i in a:
+    print(i)
+```
+
+----
+
+```python
+for k,v in b.items()：
+    print(k,v)
+```
+
+-----
+
+
+![](2019-08-13-22-23-38.png)
+
+
+-----
+
+数据库操作
+
+----
+
+```
+pip install store
+```
+
+----
+
+database
+
+```python
+from store.database import store
+
+class cat(store):
+  pass
+```
+
+----
+
+add 
+
+```python
+
+if __name__ == "__main__":
+    cat = cat(provider='sqlite')
+    cat.zoe = {
+        'gender': 'female',
+        'age': 1,
+        'feature': ['lovely', 'beautiful']
+    }
+    cat.meng = {
+        'gender': 'female',
+        'age': 1,
+        'feature': ['lovely', 'soft']
+    }
+    cat.mimi = {
+        'gender': 'female',
+        'age': 0.5,
+        'feature': ['lovely']
+    }
+    cat.orz = {
+        'gender': 'male',
+        'age': 1.5,
+        'feature': ['leadership', 'speed']
+
+    }
+    cat.neo = {
+        'gender': 'male',
+        'age': 0.3,
+        'feature': ['cute']
+    }
+
+```
+
+----
+
+query
+
+```python
+if __name__ == "__main__":
+    cat = Cat(provider='sqlite')
+    print('.'*40)
+    print(cat.miaomiao)
+    print(cat.mimi)
+    print('.'*40)
+    print(cat.orz.feature)
+    print('.'*40)
+    print(cat['feature:cute'])
+    print('.'*40)
+    print(cat['gender=male'])
+    print('.'*40)
+    print(cat['^m'])
+```
+
+
+----
+
+
+update
+
+```python
+if __name__ == "__main__":
+    cat = Cat(provider='sqlite')
+    cat.miaomiao.age = cat.miaomiao.age + 1
+```
+
+----
+
+query again
+
+```python
+if __name__ == "__main__":
+    cat = Cat(provider='sqlite')
+    print(cat['age>1'])
+```
+
+----
+
+```python
+if __name__ == "__main__":
+    cat = Cat(provider='sqlite')
+    del cat['gender=male']
+    print(cat['*'])
+```
+
+-----
+
+try it out (6)
+
+----
+
+```python
+from store.database import Store
+
+class User(Store):
+  pass
+
+class Post(Store):
+  pass
+
+
+user = User('sqlite')
+post = User('sqlite')
+
+def add_user(username, password):
+    user[username] = password
+    return username
+
+def validate(username='anonymous', password='dangerous'):
+    print(user[username])
+    return user[username] and user[username].value == password
+
+
+def add_post(title, content, username='anonymous', password='dangerous'):
+    valid = validate(username, password)
+    if valid:
+        return post.add({
+            'title': title,
+            'content': content,
+            'user': username
+        })
+    else:
+        print('invalid')
+
+def query_post_by_user(username):
+    return post[f'user={username}']
+
+
+if __name__ == "__main__":
+    add_user('admin', 'admin')
+    add_post('这是一篇入门教程', '1. docker 简介\n2. docker 架构\n3. docker 命令基础\n...', 'admin', 'admin')
+    posts = query_post_by_user('admin')
+    print(posts)
+```
+
+
+-----
+
+
+开放式的作业
+
+----
+
+- OpenAPI
+- python connexion
+- VUE 
+- docker swarm
+
+----
+
+blog.py 同 try it out(6)
+
+----
+
+api.py
+
+```python
+from blog import query_all
+
+def all(name):
+    posts = query_all()
+    return [
+        {
+            'id': post.id,
+            'key': post.key,
+            'title': post.title,
+            'author': post.user,
+            'content': post.content
+        } for post in posts
+    ]
+```
+
+----
+
+run.py
+
+```python
+import connexion
+from flask_cors import CORS
+
+if __name__ == '__main__':
+    capp = connexion.FlaskApp(__name__, specification_dir='specs/')
+    capp.add_api('blog.yaml', arguments={'title': 'Hello World Example'})
+    CORS(capp.app)
+    capp.run(host='0.0.0.0', debug=True, port=9090)
+```
+
+----
+
+blog.yaml
+
+```yaml
+openapi: "3.0.0"
+
+info:
+  title: Hello World
+  version: "1.0"
+servers:
+  - url: http://0.0.0.0:9090/v1.0
+
+paths:
+  /posts:
+    post:
+      summary: post
+      description: post
+      operationId: api.all
+      responses:
+        200:
+          description: blog response
+          content:
+            text/plain:
+              schema:
+                type: object
+```
+
+----
+
+server.py
+
+```python
+from http.server import HTTPServer, SimpleHTTPRequestHandler
+from socketserver import ThreadingMixIn
+import sys
+
+class CORSRequestHandler (SimpleHTTPRequestHandler):
+    def end_headers (self):
+        self.send_header('Access-Control-Allow-Origin', '*')
+        SimpleHTTPRequestHandler.end_headers(self)
+
+class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
+    pass
+
+if __name__ == '__main__':
+    server = ThreadedHTTPServer(('localhost', 8088), CORSRequestHandler)
+    server.serve_forever()
+```
+
+----
+
+index.html
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Blog Demo</title>
+  <script src="vue.min.js"></script>
+  <script src="axios.min.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      new Vue({
+        el: '#content',
+        data: {
+          posts: []
+        },
+        methods: {
+            fetchPosts:    function (event) {
+                axios.post('http://0.0.0.0:9090/v1.0/posts', {
+                })
+                .then(
+                    response => {
+                    console.log(this.posts)
+                    this.posts = response.data
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+            }   
+        },
+        mounted(){
+            this.fetchPosts()
+        }
+      })
+    })
+  </script>
+</head>
+<body>
+  <!-- text -->
+  <div id="content">
+    <ul>
+    <li v-for="item in posts" :id="item.key">
+        {{ item.title }} - {{ item.author }} 
+        <br />
+        {{ item.content }}
+    </li>
+    </ul>
+  </div>
+</body>
+</html>
+```
+
+----
+
+![](2019-08-13-23-11-07.png)
+
+----
+
+deploy it to swarm !
+
+-----
+
+Thanks!
+
+

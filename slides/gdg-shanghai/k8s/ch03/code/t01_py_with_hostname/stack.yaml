@@ -1,0 +1,9 @@
+version: "3"
+
+services:
+  flask:
+    image: friendlyhello:v4
+    ports:
+      - "5055:5000"
+    environment:
+      HOSTNAME: '${hostname}'

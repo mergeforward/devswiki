@@ -1,0 +1,24 @@
+<html>
+<body>
+<div id="content"></div>
+</body>
+
+<script>
+function getCORS(method, url, success) {
+    var xhr = new XMLHttpRequest();
+    if (!('withCredentials' in xhr)) xhr = new XDomainRequest(); // fix IE8/9
+    xhr.open(method, url);
+    xhr.onload = success;
+    xhr.send();
+    return xhr;
+}
+
+// example request
+getCORS('POST', 'http://0.0.0.0:9090/v1.0/greeting/jesse', function(request){
+    var response = request.currentTarget.response || request.target.responseText;
+    console.log(response);
+    document.getElementById('content').innerHTML = response
+});
+</script>
+
+</html>

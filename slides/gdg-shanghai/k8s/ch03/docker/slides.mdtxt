@@ -1,0 +1,1238 @@
+# 第三课
+
+## from Swarm to K8s
+author: Makefile君 (dameng)
+
+----
+
+本节大纲
+
+- 前两节内容 recap
+- swarm 进一步
+- 漫谈kubernetes
+- minikube上手
+
+
+-----
+
+## docker recap
+
+----
+
+- docker
+- Dockerfile
+- docker compose
+- docker engine
+- docker swarm
+
+----
+
+从resource的角度来看
+
+- container
+- image
+- swarm
+- node
+- stack
+- service
+
+-----
+
+## swarm 进一步
+
+----
+
+假定我们有这样的网络环境
+
+- 宿主机(也是linux) 网卡实际的 ip `10.x.x.x`
+- 虚拟出的网络 vboxnet1 主ip `192.168.99.1`
+
+----
+
+dameng-00 和 dameng-01 为 挂载在vboxnet1 网络下的 两台装有 alpine 系统的 vm的hostname
+
+----
+
+```
+dameng-00 地址为 192.168.99.200
+dameng-01 地址为 192.168.99.201
+```
+
+----
+
+同时通过docker machine，将其组网（省略，参考ch02）
+
+```
+192.168.99.200 的machine名字为alpine-00
+192.168.99.201 的machine名字为alpine-01
+```
+
+----
+
+
+## Try it out
+
+初始化 swarm 集群
+
+----
+
+宿主机本机执行过`docker swarm init`
+
+![](2019-08-22-01-39-13.png)
+
+----
+
+在宿主机上执行
+```
+docker-machine ssh alpine-00 -- docker swarm join --token SWMTKN-1-3abblb1ryj5npa86rwp6pbui05xkjqx9fz6mubmro0a2147xk0-ata64i6kxrcpvnkfj69ky3842 192.168.99.1:2377
+```
+
+```
+docker-machine ssh alpine-01 -- docker swarm join --token SWMTKN-1-3abblb1ryj5npa86rwp6pbui05xkjqx9fz6mubmro0a2147xk0-ata64i6kxrcpvnkfj69ky3842 192.168.99.1:2377
+```
+
+----
+
+两者的显示都应该是
+
+```
+This node joined a swarm as a worker.
+```
+
+----
+
+此时已经完成了组网， 可以使用
+
+```
+docker node ls
+```
+
+查看节点的信息
+
+![](2019-08-22-01-44-21.png)
+
+----
+
+## Try it out
+
+构建friendlyhello: v4
+
+----
+
+app.py
+
+```python
+from flask import Flask
+from redis import Redis, RedisError
+import os
+import socket
+
+# Connect to Redis
+redis = Redis(host="redis", db=0, socket_connect_timeout=2, socket_timeout=2)
+
+app = Flask(__name__)
+
+@app.route("/")
+def hello():
+    try:
+        visits = redis.incr("counter")
+    except RedisError:
+        visits = "<i>cannot connect to Redis, counter disabled</i>"
+
+    html = "<b>HostName:</b> {host_name}<br/>" \
+           "<b>Hostname:</b> {hostname}<br/>" \
+           "<b>Visits:</b> {visits}"
+    return html.format(host_name=os.getenv("HOSTNAME", "UNKNOWN"),
+                       hostname=socket.gethostname(), visits=visits)
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=5000)
+```
+
+----
+
+Dockerfile
+
+```yaml
+FROM python:3.7-slim
+
+WORKDIR /app
+
+COPY . /app
+
+RUN pip install flask redis -i https://mirrors.aliyun.com/pypi/simple  --trusted-host mirrors.aliyun.com 
+EXPOSE 5000
+
+CMD ["python", "app.py"]
+```
+
+----
+
+构建
+
+```
+docker build -t friendlyhello:v4 .
+```
+
+----
+
+部署
+
+```
+docker service create --replicas 3 -p 5000:5000 --name friendly friendlyhello:v4
+```
+
+![](2019-08-22-07-34-57.png)
+
+----
+
+```
+docker service ps friendly
+```
+
+![](2019-08-22-07-40-01.png)
+
+![](2019-08-22-07-42-59.png)
+
+----
+
+先缩容一些
+
+```
+docker service scale friendly=1
+```
+
+----
+
+如何将镜像快速的分发到不同的节点?分发
+
+----
+
+```
+docker service create --name registry --publish 5555:5000 registry:2
+```
+
+![](2019-08-22-07-50-05.png)
+
+----
+
+
+```
+docker service ps registry
+```
+
+![](2019-08-22-07-51-02.png)
+
+
+----
+
+
+
+```
+docker tag friendlyhello:v4 192.168.99.1:5555/friendlyhello:v4
+```
+
+```
+docker push 192.168.99.1:5555/friendlyhello:v4
+```
+
+
+![](2019-08-22-07-53-19.png)
+
+
+----
+
+
+```
+docker-machine ssh alpine-00
+```
+
+```
+vim /etc/docker/daemon.json
+```
+
+![](2019-08-22-08-01-25.png)
+
+```
+service docker restart
+```
+
+----
+
+```
+docker-machine ssh alpine-00 -- docker pull 192.168.99.1:5555/friendlyhello:v4
+docker-machine ssh alpine-00 -- docker tag 192.168.99.1:5555/friendlyhello:v4 friendlyhello:v4
+``` 
+
+以上步骤针对alpine-01再重复一下
+
+----
+
+```
+docker service scale friendly=3
+```
+
+![](2019-08-22-08-06-41.png)
+
+----
+
+```
+docker service ps friendly
+```
+
+![](2019-08-22-08-07-31.png)
+
+----
+
+![](2019-08-22-08-10-16.png)
+
+![](2019-08-22-08-10-28.png)
+
+![](2019-08-22-08-10-40.png)
+
+----
+
+我们想要的是宿主机的hostname
+
+
+如何传入？环境变量
+
+----
+
+```
+docker service create --replicas 3 -p 5005:5000 --name friendly2 -e HOSTNAME=`hostname` friendlyhello:v4
+```
+
+----
+
+![](2019-08-22-08-29-44.png)
+
+![](2019-08-22-08-30-24.png)
+
+![](2019-08-22-08-30-53.png)
+
+----
+
+####  Q: 如何传入宿主机的hostname? 
+
+----
+
+```
+docker service create --replicas 3 -p 5055:5000 --name friendly3 -e HOSTNAME="{{.Node.Hostname}}" --hostname="{{.Node.Hostname}}-{{.Node.ID}}-{{.Service.Name}}" friendlyhello:v4
+```
+
+![](2019-08-22-08-31-45.png)
+![](2019-08-22-08-31-58.png)
+![](2019-08-22-08-32-15.png)
+
+-----
+
+## Try it out
+更直观的管理 docker与swarm
+
+----
+
+```
+docker run  -d -p 9000:9000 \
+--name portainer --restart=always \
+-v /var/run/docker.sock:/var/run/docker.sock \
+portainer/portainer
+```
+
+----
+
+![](2019-08-25-15-42-59.png)
+
+----
+
+![](2019-08-25-15-44-45.png)
+
+-----
+
+## phippy and its' friends
+
+-----
+
+<video width="1600" controls style="margin-bottom:30px">
+  <source src="ship.mp4" type="video/mp4">
+  Your browser does not support HTML5 video.
+</video>
+
+-----
+
+![](2019-08-22-23-18-32.png)
+
+----
+
+![](2019-08-30-23-47-29.png)
+
+----
+
+![](2019-08-22-07-47-52.png)
+
+----
+
+![](2019-08-30-23-50-21.png)
+
+----
+
+![](2019-08-22-23-23-08.png)
+
+----
+
+![](2019-08-22-23-24-49.png)
+
+----
+
+![](2019-08-22-23-25-30.png)
+
+----
+
+
+![](2019-08-22-23-29-24.png)
+
+----
+
+
+![](2019-08-22-23-26-45.png)
+
+----
+
+
+
+![](2019-08-22-23-27-37.png)
+
+----
+
+![](2019-08-22-23-28-47.png)
+
+----
+
+![](2019-08-22-23-31-23.png)
+
+----
+
+![](2019-08-22-23-32-25.png)
+
+----
+
+![](2019-08-22-23-33-17.png)
+
+----
+
+![](2019-08-22-23-34-22.png)
+
+
+----
+
+![](2019-08-22-23-35-12.png)
+
+-----
+
+
+## phippy goes to the zoo
+
+-----
+
+<video width="1600" controls style="margin-bottom:30px">
+  <source src="zoo.mp4" type="video/mp4">
+  Your browser does not support HTML5 video.
+</video>
+
+-----
+
+
+![](2019-08-23-00-42-19.png)
+
+----
+
+![](2019-08-22-23-38-00.png)
+
+----
+
+![](2019-08-22-23-40-28.png)
+
+----
+
+![](2019-08-22-23-41-05.png)
+
+
+----
+
+![](2019-08-22-23-44-50.png)
+
+----
+
+![](2019-08-23-00-30-07.png)
+
+----
+
+![](2019-08-23-00-31-22.png)
+
+----
+
+![](2019-08-23-00-31-50.png)
+
+----
+
+
+![](2019-08-23-00-32-37.png)
+
+
+----
+
+![](2019-08-23-00-33-11.png)
+
+----
+
+![](2019-08-23-00-33-56.png)
+
+----
+
+![](2019-08-23-00-35-18.png)
+
+
+----
+
+![](2019-08-23-00-36-01.png)
+
+----
+
+![](2019-08-23-00-37-21.png)
+
+----
+
+![](2019-08-23-00-37-55.png)
+
+----
+
+![](2019-08-23-00-38-55.png)
+
+----
+
+![](2019-08-23-00-39-45.png)
+
+----
+
+![](2019-08-23-00-41-10.png)
+
+----
+
+![](2019-08-23-00-41-43.png)
+
+-----
+
+
+## smooth sailing with kubernetes
+
+
+----
+
+![](0.jpeg)
+
+----
+
+![](1.jpeg)
+
+----
+
+![](2.jpeg)
+
+----
+
+<div class="background" style="max-height: 600px; overflow-y: scroll;">
+![](3.jpeg)
+</div>
+
+----
+
+![](4.jpeg)
+
+----
+
+<div class="background" style="max-height: 600px; overflow-y: scroll;">
+![](5.jpeg)
+</div>
+
+----
+
+![](6.jpeg)
+
+----
+
+![](7.jpeg)
+
+----
+
+![](8.jpeg)
+
+----
+
+![](9.jpeg)
+
+----
+
+
+![](10.jpeg)
+
+----
+
+![](11.jpeg)
+
+----
+
+<div class="background" style="max-height: 600px; overflow-y: scroll;">
+![](12.jpeg)
+</div>
+
+----
+
+![](13.jpeg)
+
+----
+
+![](14.jpeg)
+
+----
+
+![](15.jpeg)
+
+----
+
+![](16.jpeg)
+
+----
+
+![](17.jpeg)
+
+----
+
+![](18.jpeg)
+
+----
+
+![](19.jpeg)
+
+----
+
+![](20.jpeg)
+
+----
+
+![](31.jpeg)
+
+----
+
+![](32.jpeg)
+
+----
+
+![](33.jpeg)
+
+----
+
+![](34.jpeg)
+
+----
+
+![](35.jpeg)
+
+----
+
+![](36.jpeg)
+
+----
+
+![](37.jpeg)
+
+----
+
+![](38.jpeg)
+
+----
+
+![](39.jpeg)
+
+----
+
+
+![](40.jpeg)
+
+----
+
+![](41.jpeg)
+
+----
+
+![](42.jpeg)
+
+----
+
+![](43.jpeg)
+
+----
+
+![](44.jpeg)
+
+----
+
+![](45.jpeg)
+
+----
+
+![](46.jpeg)
+
+----
+
+![](47.jpeg)
+
+----
+
+![](48.jpeg)
+
+----
+
+![](2019-08-25-01-30-14.png)
+
+
+----
+
+[try it out](https://www.gstatic.com/cloud-site-ux/kubernetes-terminal.min.html)
+
+
+-----
+
+## minikube
+
+----
+
+## Try it out 
+
+使用minikube初始化节点
+
+----
+
+
+官方安装方式
+
+```
+curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 \
+  && chmod +x minikube
+```
+
+----
+
+运行
+
+```
+minikube start
+```
+
+----
+
+会得到
+
+```bash
+😄  minikube v1.3.1 on Ubuntu 18.04
+💿  Downloading VM boot image ...
+
+💣  Failed to cache ISO
+❌  Error: [DOWNLOAD_IO_TIMEOUT] https://storage.googleapis.com/minikube/iso/minikube-v1.3.0.iso: invalid checksum: Error downloading checksum file: Get https://storage.googleapis.com/minikube/iso/minikube-v1.3.0.iso.sha256: dial tcp 172.217.160.80:443: i/o timeout
+💡  Suggestion: A firewall is likely blocking minikube from reaching the internet. You may need to configure minikube to use a proxy.
+📘  Documentation: https://minikube.sigs.k8s.io/docs/reference/networking/proxy/
+⁉️   Related issues:
+    ▪ https://github.com/kubernetes/minikube/issues/3846
+
+😿  If the above advice does not help, please let us know: 
+👉  https://github.com/kubernetes/minikube/issues/new/choose
+
+```
+
+----
+
+
+下載 
+```
+https://storage.googleapis.com/minikube/iso/minikube-v1.3.0.iso
+```
+放到 `.minikube/cache/iso` 
+
+----
+
+再次运行 `minikube start`
+
+```
+😄  minikube v1.3.1 on Ubuntu 18.04
+🔥  Creating virtualbox VM (CPUs=2, Memory=2000MB, Disk=20000MB) ...
+🐳  Preparing Kubernetes v1.15.2 on Docker 18.09.8 ...
+E0825 10:40:09.250463   21942 start.go:558] Error caching images:  Caching images for kubeadm: caching images: caching image /home/dameng/.minikube/cache/images/k8s.gcr.io/etcd_3.3.10: fetching remote image: Get https://k8s.gcr.io/v2/: dial tcp 74.125.203.82:443: i/o timeout
+❌  Unable to load cached images: loading cached images: loading image /home/dameng/.minikube/cache/images/gcr.io/k8s-minikube/storage-provisioner_v1.8.1: stat /home/dameng/.minikube/cache/images/gcr.io/k8s-minikube/storage-provisioner_v1.8.1: no such file or directory
+💾  Downloading kubelet v1.15.2
+💾  Downloading kubeadm v1.15.2
+```
+
+
+----
+
+
+这就比较尴尬了,因为这个时候是在虚拟机内安装的,并且现在这个minikube的虚拟机只是插入了光盘还没有安装到硬盘!
+
+![](2019-08-25-11-08-42.png)
+
+
+----
+
+使用阿里云魔改版minikube
+
+```
+curl -Lo minikube http://kubernetes.oss-cn-hangzhou.aliyuncs.com/minikube/releases/v1.2.0/minikube-linux-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/
+```
+
+
+----
+
+
+之后就很顺利了,不过依旧要等待一段时间
+```
+minikube start --registry-mirror=https://registry.docker-cn.com
+```
+
+----
+
+输出
+
+```
+😄  minikube v1.2.0 on linux (amd64)
+✅  using image repository registry.cn-hangzhou.aliyuncs.com/google_containers
+🔥  Creating virtualbox VM (CPUs=2, Memory=2048MB, Disk=20000MB) ...
+
+🐳  Configuring environment for Kubernetes v1.15.0 on Docker 18.09.6
+💾  Downloading kubelet v1.15.0
+💾  Downloading kubeadm v1.15.0
+🚜  Pulling images ...
+🚀  Launching Kubernetes ... 
+⌛  Verifying: apiserver proxy etcd scheduler controller dns
+🏄  Done! kubectl is now configured to use "minikube"
+```
+
+-----
+
+## minikube 初体验
+
+----
+
+```
+minikube --help
+```
+
+
+```
+Minikube is a CLI tool that provisions and manages single-node Kubernetes clusters optimized for development workflows.
+
+Usage:
+  minikube [command]
+
+Available Commands:
+  addons         Modify minikube's kubernetes addons
+  cache          Add or delete an image from the local cache.
+  completion     Outputs minikube shell completion for the given shell (bash or zsh)
+  config         Modify minikube config
+  dashboard      Access the kubernetes dashboard running within the minikube cluster
+  delete         Deletes a local kubernetes cluster
+  docker-env     Sets up docker env variables; similar to '$(docker-machine env)'
+  help           Help about any command
+  ip             Retrieves the IP address of the running cluster
+  kubectl        Run kubectl
+  logs           Gets the logs of the running instance, used for debugging minikube, not user code
+  mount          Mounts the specified directory into minikube
+  profile        Profile gets or sets the current minikube profile
+  service        Gets the kubernetes URL(s) for the specified service in your local cluster
+  ssh            Log into or run a command on a machine with SSH; similar to 'docker-machine ssh'
+  ssh-key        Retrieve the ssh identity key path of the specified cluster
+  start          Starts a local kubernetes cluster
+  status         Gets the status of a local kubernetes cluster
+  stop           Stops a running local kubernetes cluster
+  tunnel         tunnel makes services of type LoadBalancer accessible on localhost
+  update-check   Print current and latest version number
+  update-context Verify the IP address of the running cluster in kubeconfig.
+  version        Print the version of minikube
+
+Flags:
+      --alsologtostderr                  log to standard error as well as files
+  -b, --bootstrapper string              The name of the cluster bootstrapper that will set up the kubernetes cluster. (default "kubeadm")
+  -h, --help                             help for minikube
+      --log_backtrace_at traceLocation   when logging hits line file:N, emit a stack trace (default :0)
+      --log_dir string                   If non-empty, write log files in this directory
+      --logtostderr                      log to standard error instead of files
+  -p, --profile string                   The name of the minikube VM being used.  
+                                         	This can be modified to allow for multiple minikube instances to be run independently (default "minikube")
+      --stderrthreshold severity         logs at or above this threshold go to stderr (default 2)
+  -v, --v Level                          log level for V logs
+      --vmodule moduleSpec               comma-separated list of pattern=N settings for file-filtered logging
+
+Use "minikube [command] --help" for more information about a command.
+```
+
+----
+
+```
+minikube status
+```
+
+```
+host: Running
+kubelet: Running
+apiserver: Running
+kubectl: Correctly Configured: pointing to minikube-vm at 192.168.99.103
+```
+
+----
+
+```
+minikube ip
+```
+
+
+```
+192.168.99.103
+```
+
+
+----
+
+```
+minikube ssh -- docker ps
+```
+
+----
+
+```
+CONTAINER ID        IMAGE                                                           COMMAND                  CREATED             STATUS              PORTS               NAMES
+4549f2d9956b        eb516548c180                                                    "/coredns -conf /etc…"   13 minutes ago      Up 13 minutes                           k8s_coredns_coredns-6967fb4995-9pch7_kube-system_ee84a37e-0ef3-41b7-89de-c453792fbd4b_1
+671bdb815d2e        eb516548c180                                                    "/coredns -conf /etc…"   13 minutes ago      Up 13 minutes                           k8s_coredns_coredns-6967fb4995-s9n99_kube-system_8498cd88-f510-4e1c-b6db-9b6405d19779_1
+1934aa77db9d        4689081edb10                                                    "/storage-provisioner"   13 minutes ago      Up 13 minutes                           k8s_storage-provisioner_storage-provisioner_kube-system_d9f4e710-8d9c-4367-a0af-3fdeb13adf8c_0
+4de2b1a57b0b        registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.1   "/pause"                 13 minutes ago      Up 13 minutes                           k8s_POD_storage-provisioner_kube-system_d9f4e710-8d9c-4367-a0af-3fdeb13adf8c_0
+243f8c977ff7        d235b23c3570                                                    "/usr/local/bin/kube…"   13 minutes ago      Up 13 minutes                           k8s_kube-proxy_kube-proxy-jdnzw_kube-system_a780994c-f248-4145-ac7f-e0150cf25c44_0
+40e1c73036f3        registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.1   "/pause"                 13 minutes ago      Up 13 minutes                           k8s_POD_coredns-6967fb4995-9pch7_kube-system_ee84a37e-0ef3-41b7-89de-c453792fbd4b_0
+f31ec9b1d097        registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.1   "/pause"                 13 minutes ago      Up 13 minutes                           k8s_POD_coredns-6967fb4995-s9n99_kube-system_8498cd88-f510-4e1c-b6db-9b6405d19779_0
+52e10f4d57a6        registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.1   "/pause"                 13 minutes ago      Up 13 minutes                           k8s_POD_kube-proxy-jdnzw_kube-system_a780994c-f248-4145-ac7f-e0150cf25c44_0
+4224f02ab33a        201c7a840312                                                    "kube-apiserver --ad…"   14 minutes ago      Up 14 minutes                           k8s_kube-apiserver_kube-apiserver-minikube_kube-system_d2c14405564ec4508d5dbe63f678d071_0
+068fc3448cb0        2c4adeb21b4f                                                    "etcd --advertise-cl…"   14 minutes ago      Up 14 minutes                           k8s_etcd_etcd-minikube_kube-system_3c3c9251899483ee3222dce0ea3ed8cd_0
+4fe34d73e985        8328bb49b652                                                    "kube-controller-man…"   14 minutes ago      Up 14 minutes                           k8s_kube-controller-manager_kube-controller-manager-minikube_kube-system_561e59a1a44be70ca4a5176499c14945_0
+6c6c1675e9da        2d3813851e87                                                    "kube-scheduler --bi…"   14 minutes ago      Up 14 minutes                           k8s_kube-scheduler_kube-scheduler-minikube_kube-system_795190ac31cedff4e18e1b025cd32ee4_0
+073a17c72dc4        119701e77cbc                                                    "/opt/kube-addons.sh"    14 minutes ago      Up 14 minutes                           k8s_kube-addon-manager_kube-addon-manager-minikube_kube-system_5327162914655af67829868f3ab76393_0
+ee239ff6cbe2        registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.1   "/pause"                 14 minutes ago      Up 14 minutes                           k8s_POD_kube-controller-manager-minikube_kube-system_561e59a1a44be70ca4a5176499c14945_0
+a730afeea5cd        registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.1   "/pause"                 14 minutes ago      Up 14 minutes                           k8s_POD_kube-apiserver-minikube_kube-system_d2c14405564ec4508d5dbe63f678d071_0
+0f9a46b05ed3        registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.1   "/pause"                 14 minutes ago      Up 14 minutes                           k8s_POD_etcd-minikube_kube-system_3c3c9251899483ee3222dce0ea3ed8cd_0
+f7e1283837f6        registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.1   "/pause"                 14 minutes ago      Up 14 minutes                           k8s_POD_kube-scheduler-minikube_kube-system_795190ac31cedff4e18e1b025cd32ee4_0
+2967ee019e9a        registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.1   "/pause"                 14 minutes ago      Up 14 minutes                           k8s_POD_kube-addon-manager-minikube_kube-system_5327162914655af67829868f3ab76393_0
+
+```
+
+----
+
+
+```
+minikube dashboard
+```
+
+```bash
+🤔  Verifying dashboard health ...
+🚀  Launching proxy ...
+🤔  Verifying proxy health ...
+🎉  Opening http://127.0.0.1:40371/api/v1/namespaces/kube-system/services/http:kubernetes-dashboard:/proxy/ in your default browser...
+Opening in existing browser session.
+```
+
+----
+
+![](2019-08-31-00-02-31.png)
+
+-----
+
+## 运行一个程序
+---cli的对比
+
+----
+
+- docker
+- kubectl
+
+----
+
+
+docker run
+
+```
+docker run --rm -d -p 8080:80 nginx
+```
+
+----
+
+swarm run
+
+```
+docker service create ....
+```
+
+```
+docker stack deploy ....
+```
+
+----
+
+kubectl run
+
+```
+kubectl run  nginx --image=nginx --port=8080 --replicas=2 --dry-run
+```
+
+```
+kubectl run --generator=deployment/apps.v1 is DEPRECATED and will be removed in a future version. Use kubectl run --generator=run-pod/v1 or kubectl create instead.
+deployment.apps/nginx created (dry run)
+```
+
+----
+
+- Using Generators (Run, Expose)
+- Using Imperative way (Create)
+- Using Declarative way (Apply)
+
+----
+
+
+## generator方式
+
+
+kubectl run again
+
+
+```
+kubectl run  --generator=run-pod/v1  nginx --image=nginx
+```
+
+----
+
+```
+kubectl get pods
+NAME    READY   STATUS         RESTARTS   AGE
+nginx   0/1     ErrImagePull   0          6m15s
+```
+
+----
+
+```
+kubectl describe pod nginx
+Name:         nginx
+Namespace:    default
+Priority:     0
+Node:         minikube/10.0.2.15
+Start Time:   Sun, 25 Aug 2019 13:10:52 +0800
+Labels:       run=nginx
+Annotations:  <none>
+Status:       Pending
+IP:           172.17.0.2
+Containers:
+  nginx:
+    Container ID:   
+    Image:          nginx
+    Image ID:       
+    Port:           <none>
+    Host Port:      <none>
+    State:          Waiting
+      Reason:       ImagePullBackOff
+    Ready:          False
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-wdgk5 (ro)
+Conditions:
+  Type              Status
+  Initialized       True 
+  Ready             False 
+  ContainersReady   False 
+  PodScheduled      True 
+Volumes:
+  default-token-wdgk5:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  default-token-wdgk5
+    Optional:    false
+QoS Class:       BestEffort
+Node-Selectors:  <none>
+Tolerations:     node.kubernetes.io/not-ready:NoExecute for 300s
+                 node.kubernetes.io/unreachable:NoExecute for 300s
+Events:
+  Type     Reason     Age                    From               Message
+  ----     ------     ----                   ----               -------
+  Normal   Scheduled  6m26s                  default-scheduler  Successfully assigned default/nginx to minikube
+  Warning  Failed     5m54s                  kubelet, minikube  Failed to pull image "nginx": rpc error: code = Unknown desc = Error response from daemon: Get https://registry-1.docker.io/v2/library/nginx/manifests/latest: Get https://auth.docker.io/token?scope=repository%3Alibrary%2Fnginx%3Apull&service=registry.docker.io: net/http: request canceled while waiting for connection (Client.Timeout exceeded while awaiting headers)
+  Warning  Failed     5m54s                  kubelet, minikube  Error: ErrImagePull
+  Normal   BackOff    5m54s                  kubelet, minikube  Back-off pulling image "nginx"
+  Warning  Failed     5m54s                  kubelet, minikube  Error: ImagePullBackOff
+  Normal   Pulling    5m40s (x2 over 6m25s)  kubelet, minikube  Pulling image "nginx"
+  Warning  Failed     21s                    kubelet, minikube  Failed to pull image "nginx": rpc error: code = Unknown desc = Error response from daemon: Get https://registry-1.docker.io/v2/library/nginx/manifests/latest: Get https://auth.docker.io/token?scope=repository%3Alibrary%2Fnginx%3Apull&service=registry.docker.io: net/http: request canceled while waiting for connection (Client.Timeout exceeded while awaiting headers)
+  Warning  Failed     21s                    kubelet, minikube  Error: ErrImagePull
+  Normal   BackOff    20s                    kubelet, minikube  Back-off pulling image "nginx"
+  Warning  Failed     20s                    kubelet, minikube  Error: ImagePullBackOff
+  Normal   Pulling    6s (x2 over 58s)       kubelet, minikube  Pulling image "nginx"
+```
+
+
+----
+
+```
+kubectl run  --generator=run-pod/v1  nginx --image=nginx --image-pull-policy=IfNotPresent
+```
+
+----
+
+
+使用proxy访问
+
+```
+kubectl proxy                    
+```
+
+显示
+
+```
+Starting to serve on 127.0.0.1:8001
+```
+
+使用如下的命令访问
+```
+curl http://localhost:8001/api/v1/namespaces/default/pods/nginx/proxy/
+```
+
+----
+
+## imperative 方式
+
+```
+kubectl create deployment --image=nginx  nginx 
+```
+
+----
+
+```
+kubectl get deployments
+```
+
+```
+NAME    READY   UP-TO-DATE   AVAILABLE   AGE
+nginx   1/1     1            1           97s
+```
+
+----
+
+如果出现拉镜像的异常,可以使用如下命令进行修改
+
+```
+kubectl edit deployment nginx
+```
+
+修改内容主要考虑
+- image
+- imagePullPolicy
+
+----
+
+
+```
+kubectl expose deployment nginx --port=80 --type=NodePort
+```
+
+输出
+
+```
+service/nginx exposed
+```
+
+使用
+```
+minikube service nginx --url
+
+```
+即输出可访问的地址
+```
+http://192.168.99.106:30392
+```
+
+其实也就是master节点加上service的端口
+
+
+----
+
+
+## declarative 方式
+
+----
+
+deployment.yaml
+```
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 2 # tells deployment to run 2 pods matching the template
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+```
+
+----
+
+执行
+
+```
+kubectl apply -f https://k8s.io/examples/application/deployment.yaml
+```
+
+
+----
+
+或者使用heredoc来执行
+
+
+```
+cat <<EOF | kubectl apply -f -
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: nginx
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 2 # tells deployment to run 2 pods matching the template
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+EOF
+
+```
+
+----
+
+thanks
+

@@ -1,0 +1,1710 @@
+
+# Docker 
+# 基础入门 
+
+<small style="font-size:32px">
+Author: dameng ( Makefile君 )
+</small>
+
+-----
+
+![](2019-07-25-20-03-58.png)
+
+
+-----
+
+
+
+## 课程大纲
+
+----
+
+- Docker 背景介绍
+- Docker特点与架构
+- Docker的安装
+- 初体验1：熟悉简单的docker指令
+- 实战1: 2048
+
+----
+
+- 初体验2：从简单的Dockerfile说起
+- 实战2: python demo
+- 镜像仓库
+- 常用Dockerfile中的指令
+- 实战3: 健康检查配置
+- 实战4: 连接redis
+
+-----
+
+# Docker
+
+# 背景介绍
+
+-----
+
+## Docker ?
+
+Docker is a set of coupled **software-as-a-service** and **platform-as-a-service** products that use operating-system-level virtualization to **develop** and **deliver** software in packages called **containers**.
+
+The software that hosts the containers is called **Docker Engine**.
+It was first started in **2013** and is developed by **Docker**, Inc.
+The service has both free and premium tiers.
+
+----
+
+
+![](2019-07-21-20-04-10.png)
+
+Package Software into Standardized Units for Development, Shipment and Deployment
+
+-----
+
+### 发展史(开发者视角)
+
+Docker's first iteration was a platform-as-a-service company called dotCloud, 
+which was founded by Solomon Hykes and Sebastien Pahl during the **Y Combinator Summer 2010** startup incubator group and launched in 2011.
+
+
+----
+
+Hykes started Docker in France as an internal project within **dotCloud**,
+with initial contributions by other dotCloud engineers including Andrea Luzzardi and Francois-Xavier Bourlet.
+Jeff Lindsay also became involved as an independent collaborator.
+
+Docker represents an evolution of dotCloud's proprietary technology, which is itself built on earlier open-source projects such as Cloudlets.
+
+
+----
+
+
+The software debuted to the public in Santa Clara at **PyCon** in 2013.
+
+Docker was released as open source in March 2013.
+On March 13, 2014, with the release of version 0.9, Docker dropped **LXC** as the default execution environment and replaced it with its own **libcontainer** library written in the Go programming language.
+
+----
+
+
+![](2019-08-03-09-27-10.png)
+
+
+-----
+
+### 发展史（项目视角） 
+
+- On September 19, 2013, Red Hat and Docker announced a collaboration around Fedora, Red Hat Enterprise Linux, and OpenShift.
+- In November 2014 Docker container services were announced for the Amazon Elastic Compute Cloud (EC2).
+
+
+----
+
+- On November 10, 2014, Docker announced a partnership with Stratoscale.
+- On December 4, 2014, IBM announced a strategic partnership with Docker that enables Docker to integrate more closely with the IBM Cloud.
+
+----
+
+- On June 22, 2015, Docker and several other companies announced that they are working on a new vendor and operating-system-independent standard for software containers.
+- As of October 24, 2015, the project had over 25,600 GitHub stars (making it the 20th most-starred GitHub project), over 6,800 forks, and nearly 1,100 contributors.
+
+
+----
+
+- In April 2016, Windocks, an independent ISV released a port of Docker's open source project to Windows, supporting Windows Server 2012 R2 and Server 2016, with all editions of SQL Server 2008 onward.
+- A May 2016 analysis showed the following organizations as main contributors to Docker: The Docker team, Cisco, Google, Huawei, IBM, Microsoft, and Red Hat.
+
+----
+
+- A January 2017 analysis of LinkedIn profile mentions showed Docker presence grew by 160% in 2016.
+
+-----
+
+### 发展史 （对比视角）
+
+----
+
+![](2019-08-03-09-40-20.png)
+
+----
+
+![](2019-08-03-09-43-14.png)
+
+----
+
+![](2019-08-03-09-45-28.png)
+
+----
+
+![](2019-08-03-09-46-21.png)
+
+----
+
+![](2019-08-03-09-47-50.png)
+
+----
+
+![](2019-08-03-09-49-04.png)
+
+----
+
+![](2019-07-23-00-08-22.png)
+
+-----
+
+## 小插曲： Y.C. 创始人
+
+![](2019-07-21-21-28-35.png)
+
+
+----
+
+
+![](2019-07-21-21-29-17.png)
+
+
+-----
+
+# Docker特点与架构
+
+-----
+
+## Docker的特点
+
+Docker is a platform for developers and sysadmins to develop, deploy, and run applications with containers. The use of Linux containers to deploy applications is called **containerization**. Containers are not new, but their use for easily deploying applications is.
+
+----
+
+Containerization is increasingly popular because containers are:
+
+- **Flexible**: Even the most complex applications can be containerized.
+- **Lightweight**: Containers leverage and share the host kernel.
+- **Interchangeable**: You can deploy updates and upgrades on-the-fly.
+- **Portable**: You can build locally, deploy to the cloud, and run anywhere.
+- **Scalable**: You can increase and automatically distribute container replicas.
+- **Stackable**: You can stack services vertically and on-the-fly.
+
+
+----
+
+![](2019-07-21-23-26-38.png)
+
+-----
+
+## 和虚拟机的区别
+
+
+----
+
+![](2019-07-21-21-18-58.png)
+
+----
+
+![](2019-08-03-09-34-25.png)
+
+-----
+
+## Docker 架构
+
+----
+
+![](2019-08-03-17-47-35.png)
+
+----
+
+![](2019-07-22-19-36-22.png)
+
+
+
+----
+
+
+## 名词解释1
+
+- Docker Daemon docker的守护进程(dockerd)
+- Client 客户端
+- Registry 镜像仓库
+
+----
+
+## 名词解释2
+
+#### Docker对象
+
+- Container 容器
+- Image 镜像
+
+-----
+
+## 背后的技术
+
+- **Namespaces**
+- **Control groups**
+- Union file systems
+- Container format
+
+-----
+
+# Docker的安装
+
+-----
+
+## 安装 Docker （ubuntu）
+
+----
+
+#### 卸载旧版
+
+```
+sudo apt-get remove docker docker-engine docker.io containerd runc
+```
+
+
+----
+
+#### 安装依赖
+
+```
+sudo apt-get install \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg-agent \
+    software-properties-common
+```
+
+----
+
+#### 获取gpg key
+```
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+```
+
+----
+
+#### 添加私有apt源
+
+```
+sudo add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   $(lsb_release -cs) \
+   stable"
+```
+
+----
+
+#### 安装docker
+
+```
+sudo apt-get install docker-ce docker-ce-cli containerd.io
+```
+
+-----
+
+# 初体验1：熟悉简单的docker指令
+
+-----
+
+
+
+## 从help开始
+
+```
+docker --version
+```
+
+```
+docker info
+```
+
+```
+docker --help
+```
+
+----
+
+```
+docker --version
+```
+
+
+![](2019-07-21-23-45-42.png) <!-- .element height="400px" width="800px" -->
+
+
+----
+
+```
+docker info
+```
+
+```yaml
+Containers: 7
+ Running: 0
+ Paused: 0
+ Stopped: 7
+Images: 352
+Server Version: 18.09.7
+Storage Driver: overlay2
+ Backing Filesystem: extfs
+ Supports d_type: true
+ Native Overlay Diff: true
+Logging Driver: json-file
+Cgroup Driver: systemd
+Plugins:
+ Volume: local
+ Network: bridge host macvlan null overlay
+ Log: awslogs fluentd gcplogs gelf journald json-file local logentries splunk syslog
+Swarm: inactive
+Runtimes: runc
+Default Runtime: runc
+Init Binary: docker-init
+containerd version: 894b81a4b802e4eb2a91d1ce216b8817763c29fb
+runc version: 425e105d5a03fabd737a126ad93d62a9eeede87f
+init version: fec3683
+Security Options:
+ apparmor
+ seccomp
+  Profile: default
+Kernel Version: 4.15.0-54-generic
+Operating System: Ubuntu 18.04.2 LTS
+OSType: linux
+Architecture: x86_64
+CPUs: 8
+Total Memory: 15.55GiB
+Name: ubuntu
+ID: HES6:HU5W:2I66:LMTW:O4N7:ZND2:6BRC:DU2W:CNIL:RX2H:TJOD:VQLN
+Docker Root Dir: /var/lib/docker
+Debug Mode (client): false
+Debug Mode (server): true
+ File Descriptors: 21
+ Goroutines: 37
+ System Time: 2019-07-22T19:09:29.697208288+08:00
+ EventsListeners: 0
+Username: pingf
+Registry: https://index.docker.io/v1/
+Labels:
+Experimental: false
+Insecure Registries:
+ nat-harbor.daocloud.io
+ 0.0.0.0/0
+ 127.0.0.0/8
+Registry Mirrors:
+ http://f1361db2.m.daocloud.io/
+Live Restore Enabled: false
+Product License: Community Engine
+
+WARNING: No swap limit support
+```
+
+----
+
+
+```
+docker --help
+```
+
+----
+
+```
+Usage:	docker [OPTIONS] COMMAND
+....
+```
+
+----
+
+### options
+
+```
+Options:
+      --config string      Location of client config files (default "/home/dameng/.docker")
+  -D, --debug              Enable debug mode
+  -H, --host list          Daemon socket(s) to connect to
+  -l, --log-level string   Set the logging level ("debug"|"info"|"warn"|"error"|"fatal") (default "info")
+      --tls                Use TLS; implied by --tlsverify
+      --tlscacert string   Trust certs signed only by this CA (default "/home/dameng/.docker/ca.pem")
+      --tlscert string     Path to TLS certificate file (default "/home/dameng/.docker/cert.pem")
+      --tlskey string      Path to TLS key file (default "/home/dameng/.docker/key.pem")
+      --tlsverify          Use TLS and verify the remote
+  -v, --version            Print version information and quit
+```
+
+----
+
+
+### Management Commands:
+
+```
+  builder     Manage builds
+  config      Manage Docker configs
+  container   Manage containers
+  engine      Manage the docker engine
+  image       Manage images
+  network     Manage networks
+  node        Manage Swarm nodes
+  plugin      Manage plugins
+  secret      Manage Docker secrets
+  service     Manage services
+  stack       Manage Docker stacks
+  swarm       Manage Swarm
+  system      Manage Docker
+  trust       Manage trust on Docker images
+  volume      Manage volumes
+```
+
+
+----
+
+### Commands:
+
+```
+  attach      Attach local standard input, output, and error streams to a running container
+  build       Build an image from a Dockerfile
+  commit      Create a new image from a container's changes
+  cp          Copy files/folders between a container and the local filesystem
+  create      Create a new container
+  diff        Inspect changes to files or directories on a container's filesystem
+  events      Get real time events from the server
+  exec        Run a command in a running container
+  export      Export a container's filesystem as a tar archive
+  history     Show the history of an image
+  images      List images
+  import      Import the contents from a tarball to create a filesystem image
+  info        Display system-wide information
+  inspect     Return low-level information on Docker objects
+  kill        Kill one or more running containers
+  load        Load an image from a tar archive or STDIN
+  login       Log in to a Docker registry
+  logout      Log out from a Docker registry
+  logs        Fetch the logs of a container
+  pause       Pause all processes within one or more containers
+  port        List port mappings or a specific mapping for the container
+  ps          List containers
+  pull        Pull an image or a repository from a registry
+  push        Push an image or a repository to a registry
+  rename      Rename a container
+  restart     Restart one or more containers
+  rm          Remove one or more containers
+  rmi         Remove one or more images
+  run         Run a command in a new container
+  save        Save one or more images to a tar archive (streamed to STDOUT by default)
+  search      Search the Docker Hub for images
+  start       Start one or more stopped containers
+  stats       Display a live stream of container(s) resource usage statistics
+  stop        Stop one or more running containers
+  tag         Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE
+  top         Display the running processes of a container
+  unpause     Unpause all processes within one or more containers
+  update      Update configuration of one or more containers
+  version     Show the Docker version information
+  wait        Block until one or more containers stop, then print their exit codes
+```
+
+-----
+
+## 简单的指令
+
+----
+
+### 运行一个容器
+
+----
+
+```
+docker run hello-world
+```
+
+----
+
+```
+Unable to find image 'hello-world:latest' locally
+latest: Pulling from library/hello-world
+1b930d010525: Pull complete 
+Digest: sha256:92c7f9c92844bbbb5d0a101b22f7c2a7949e40f8ea90c8b3bc396879d95e899a
+Status: Downloaded newer image for hello-world:latest
+
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+
+To generate this message, Docker took the following steps:
+ 1. The Docker client contacted the Docker daemon.
+ 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+    (amd64)
+ 3. The Docker daemon created a new container from that image which runs the
+    executable that produces the output you are currently reading.
+ 4. The Docker daemon streamed that output to the Docker client, which sent it
+    to your terminal.
+
+To try something more ambitious, you can run an Ubuntu container with:
+ $ docker run -it ubuntu bash
+
+Share images, automate workflows, and more with a free Docker ID:
+ https://hub.docker.com/
+
+For more examples and ideas, visit:
+ https://docs.docker.com/get-started/
+```
+
+----
+
+### 拉取镜像
+
+```
+docker pull ubuntu
+```
+
+----
+
+### 直接运行
+
+```
+docker run -it ubuntu bash
+```
+
+----
+
+
+![](2019-07-23-00-29-23.png)
+
+
+-----
+
+## 镜像
+
+- Image
+- ISO?
+
+----
+
+## 罗列镜像
+
+```
+docker images
+```
+
+```
+docker image ls
+```
+
+----
+
+
+## 审查镜像
+
+
+```
+docker inspect ubuntu
+```
+
+```json
+[
+    {
+        "Id": "sha256:4c108a37151f54439950335c409802e948883e00c93fdb751d206c9a9674c1f6",
+        "RepoTags": [
+            "ubuntu:latest"
+        ],
+        "RepoDigests": [
+            "ubuntu@sha256:55b83a53caa3a88694afc25be0abceba52d48fca3d5d531539fb8049347fd929"
+        ],
+        "Parent": "",
+        "Comment": "",
+        "Created": "2019-06-18T22:51:38.340092056Z",
+        "Container": "fdea049ea807b599050e885a88784e009ed78ebcc4d498be93744bb9374c6134",
+        "ContainerConfig": {
+            "Hostname": "fdea049ea807",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+            ],
+            "Cmd": [
+                "/bin/sh",
+                "-c",
+                "#(nop) ",
+                "CMD [\"/bin/bash\"]"
+            ],
+            "ArgsEscaped": true,
+            "Image": "sha256:ae950a0376fe6c4d08fa7ff395f50f4a909e26e9f2d865d8641cda024161c6ee",
+            "Volumes": null,
+            "WorkingDir": "",
+            "Entrypoint": null,
+            "OnBuild": null,
+            "Labels": {}
+        },
+        "DockerVersion": "18.06.1-ce",
+        "Author": "",
+        "Config": {
+            "Hostname": "",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+            ],
+            "Cmd": [
+                "/bin/bash"
+            ],
+            "ArgsEscaped": true,
+            "Image": "sha256:ae950a0376fe6c4d08fa7ff395f50f4a909e26e9f2d865d8641cda024161c6ee",
+            "Volumes": null,
+            "WorkingDir": "",
+            "Entrypoint": null,
+            "OnBuild": null,
+            "Labels": null
+        },
+        "Architecture": "amd64",
+        "Os": "linux",
+        "Size": 64184378,
+        "VirtualSize": 64184378,
+        "GraphDriver": {
+            "Data": {
+                "LowerDir": "/var/lib/docker/overlay2/e56f80b242309b500eccc154e0eddc075e345ebd84274a3a7396f3190837dd85/diff:/var/lib/docker/overlay2/3efd4028b08bda1251ff9859693425535e52a54dedea235383ad32282cac3b22/diff:/var/lib/docker/overlay2/226d2b1f75c6cc40fd351e0cc8ac97e8b1ed400086985f4f6d90d9fbcf41477b/diff",
+                "MergedDir": "/var/lib/docker/overlay2/6431668ed5b936943ba131016d31c8eaf129af35f7a24f084fd159074bb0d37f/merged",
+                "UpperDir": "/var/lib/docker/overlay2/6431668ed5b936943ba131016d31c8eaf129af35f7a24f084fd159074bb0d37f/diff",
+                "WorkDir": "/var/lib/docker/overlay2/6431668ed5b936943ba131016d31c8eaf129af35f7a24f084fd159074bb0d37f/work"
+            },
+            "Name": "overlay2"
+        },
+        "RootFS": {
+            "Type": "layers",
+            "Layers": [
+                "sha256:ba9de9d8475e7f5e40086358a1353b3cc080994fc6d31e4272dd3acb69b0151e",
+                "sha256:fbd2732ad777cb5db2515fa62b6122b797be233d01db02e0a19e5d894688cad6",
+                "sha256:dda1518598187bf87704acc22aa0ec2a67d9e7835c24346dfca118ab42c5cd0b",
+                "sha256:75e70aa52609fdbd63b58d46d6f7c20470062e1c9bb75616f7703a358a61e5ca"
+            ]
+        },
+        "Metadata": {
+            "LastTagTime": "0001-01-01T00:00:00Z"
+        }
+    }
+]
+```
+
+-----
+
+
+## 容器
+
+- Container
+- OS?
+
+----
+
+## 罗列容器
+
+----
+
+```
+docker ps
+```
+
+```
+docker ps -a 
+```
+
+----
+
+```
+docker container ls
+```
+
+```
+docker container ls -a 
+```
+
+----
+
+## 运行容器
+
+
+```
+docker run --name test-exec -it ubuntu bash
+```
+
+```
+docker exec -it test-exec bash
+```
+
+![](2019-07-23-21-40-12.png)
+
+----
+
+## 审查容器
+
+```
+docker inspect test-exec
+```
+```json
+[
+    {
+        "Id": "b986c633a5b8b47896e9b86eb1a228844d949c75da06acb103561de3e78b83b8",
+        "Created": "2019-07-23T13:39:27.026614882Z",
+        "Path": "bash",
+        "Args": [],
+        "State": {
+            "Status": "running",
+            "Running": true,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 16212,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2019-07-23T13:39:28.159151432Z",
+            "FinishedAt": "0001-01-01T00:00:00Z"
+        },
+        "Image": "sha256:4c108a37151f54439950335c409802e948883e00c93fdb751d206c9a9674c1f6",
+        "ResolvConfPath": "/var/lib/docker/containers/b986c633a5b8b47896e9b86eb1a228844d949c75da06acb103561de3e78b83b8/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/b986c633a5b8b47896e9b86eb1a228844d949c75da06acb103561de3e78b83b8/hostname",
+        "HostsPath": "/var/lib/docker/containers/b986c633a5b8b47896e9b86eb1a228844d949c75da06acb103561de3e78b83b8/hosts",
+        "LogPath": "/var/lib/docker/containers/b986c633a5b8b47896e9b86eb1a228844d949c75da06acb103561de3e78b83b8/b986c633a5b8b47896e9b86eb1a228844d949c75da06acb103561de3e78b83b8-json.log",
+        "Name": "/test-exec",
+        "RestartCount": 0,
+        "Driver": "overlay2",
+        "Platform": "linux",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "docker-default",
+        "ExecIDs": [
+            "daf6071867e9181824555086ce50fab172fef7377c44ac6720786cd96896f9ee"
+        ],
+        "HostConfig": {
+            "Binds": null,
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "default",
+            "PortBindings": {},
+            "RestartPolicy": {
+                "Name": "no",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "CapAdd": null,
+            "CapDrop": null,
+            "Dns": [],
+            "DnsOptions": [],
+            "DnsSearch": [],
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "shareable",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": null,
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 0,
+            "NanoCpus": 0,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": [],
+            "BlkioDeviceReadBps": null,
+            "BlkioDeviceWriteBps": null,
+            "BlkioDeviceReadIOps": null,
+            "BlkioDeviceWriteIOps": null,
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": [],
+            "DeviceCgroupRules": null,
+            "DiskQuota": 0,
+            "KernelMemory": 0,
+            "MemoryReservation": 0,
+            "MemorySwap": 0,
+            "MemorySwappiness": null,
+            "OomKillDisable": false,
+            "PidsLimit": 0,
+            "Ulimits": null,
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "MaskedPaths": [
+                "/proc/asound",
+                "/proc/acpi",
+                "/proc/kcore",
+                "/proc/keys",
+                "/proc/latency_stats",
+                "/proc/timer_list",
+                "/proc/timer_stats",
+                "/proc/sched_debug",
+                "/proc/scsi",
+                "/sys/firmware"
+            ],
+            "ReadonlyPaths": [
+                "/proc/bus",
+                "/proc/fs",
+                "/proc/irq",
+                "/proc/sys",
+                "/proc/sysrq-trigger"
+            ]
+        },
+        "GraphDriver": {
+            "Data": {
+                "LowerDir": "/var/lib/docker/overlay2/4a818a42cfc565f32799aa67ecde0fab753a8a14611adc5ac3e145a9402b28ba-init/diff:/var/lib/docker/overlay2/6431668ed5b936943ba131016d31c8eaf129af35f7a24f084fd159074bb0d37f/diff:/var/lib/docker/overlay2/e56f80b242309b500eccc154e0eddc075e345ebd84274a3a7396f3190837dd85/diff:/var/lib/docker/overlay2/3efd4028b08bda1251ff9859693425535e52a54dedea235383ad32282cac3b22/diff:/var/lib/docker/overlay2/226d2b1f75c6cc40fd351e0cc8ac97e8b1ed400086985f4f6d90d9fbcf41477b/diff",
+                "MergedDir": "/var/lib/docker/overlay2/4a818a42cfc565f32799aa67ecde0fab753a8a14611adc5ac3e145a9402b28ba/merged",
+                "UpperDir": "/var/lib/docker/overlay2/4a818a42cfc565f32799aa67ecde0fab753a8a14611adc5ac3e145a9402b28ba/diff",
+                "WorkDir": "/var/lib/docker/overlay2/4a818a42cfc565f32799aa67ecde0fab753a8a14611adc5ac3e145a9402b28ba/work"
+            },
+            "Name": "overlay2"
+        },
+        "Mounts": [],
+        "Config": {
+            "Hostname": "b986c633a5b8",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": true,
+            "AttachStdout": true,
+            "AttachStderr": true,
+            "Tty": true,
+            "OpenStdin": true,
+            "StdinOnce": true,
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+            ],
+            "Cmd": [
+                "bash"
+            ],
+            "Image": "ubuntu",
+            "Volumes": null,
+            "WorkingDir": "",
+            "Entrypoint": null,
+            "OnBuild": null,
+            "Labels": {}
+        },
+        "NetworkSettings": {
+            "Bridge": "",
+            "SandboxID": "e0d9cf4381bae8315a77c198232bc7798766a1c35b1ef37c536ba78863784fd6",
+            "HairpinMode": false,
+            "LinkLocalIPv6Address": "",
+            "LinkLocalIPv6PrefixLen": 0,
+            "Ports": {},
+            "SandboxKey": "/var/run/docker/netns/e0d9cf4381ba",
+            "SecondaryIPAddresses": null,
+            "SecondaryIPv6Addresses": null,
+            "EndpointID": "e2f17eafae4bae1a35e34925ddf6b79365871b370d12e740a6a3bae762684226",
+            "Gateway": "172.17.0.1",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "IPAddress": "172.17.0.2",
+            "IPPrefixLen": 16,
+            "IPv6Gateway": "",
+            "MacAddress": "02:42:ac:11:00:02",
+            "Networks": {
+                "bridge": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "NetworkID": "94fb6be8f153878a0d58bf2689a5afb5c8f23890fc0fc89851cae8511a1a0b02",
+                    "EndpointID": "e2f17eafae4bae1a35e34925ddf6b79365871b370d12e740a6a3bae762684226",
+                    "Gateway": "172.17.0.1",
+                    "IPAddress": "172.17.0.2",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "MacAddress": "02:42:ac:11:00:02",
+                    "DriverOpts": null
+                }
+            }
+        }
+    }
+]
+```
+
+
+
+-----
+
+# 实战1: 2048
+
+-----
+
+
+## Try it Out (1)
+
+
+#### 2048
+
+----
+
+```bash
+docker run -d -P daocloud.io/daocloud/dao-2048
+```
+
+
+
+-----
+
+
+# 初体验2：从简单的Dockerfile说起
+
+
+-----
+
+
+```
+FROM ubuntu:15.04
+COPY . /app
+RUN make /app
+CMD python /app/app.py
+```
+
+----
+
+
+## 引深： 指令与层
+
+每一个指令都会创建一个层
+
+
+- FROM 从 ubuntu:15.04 镜像创建层.
+- COPY 添加当前文件夹的文件.
+- RUN 运行特定的指令
+- CMD 指定容器启动时的默认指令.
+
+----
+
+![](2019-07-25-14-09-17.png)
+
+----
+
+![](2019-07-25-14-15-42.png)
+
+
+-----
+
+# 实战2: python demo
+
+-----
+
+## Try it Out (2)
+
+#### python demo
+
+----
+
+## project files
+
+----
+
+Dockerfile
+
+```dockerfile
+WORKDIR /app
+
+COPY . /app
+
+RUN pip install flask -i https://mirrors.aliyun.com/pypi/simple  --trusted-host mirrors.aliyun.com 
+
+EXPOSE 80
+
+ENV NAME World
+
+CMD ["python", "app.py"]
+```
+
+----
+
+app.py
+
+```python
+from flask import Flask
+import os
+import socket
+
+app = Flask(__name__)
+
+@app.route("/")
+def hello():
+    html = "<h3>Hello {name}!</h3>" \
+           "<b>Hostname:</b> {hostname}" 
+    return html.format(name=os.getenv("NAME", "world"), 
+                       hostname=socket.gethostname())
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=80)
+```
+
+-----
+
+## 构建与运行 
+
+
+----
+
+#### build
+
+```
+docker build --tag=friendlyhello .
+```
+
+#### run
+
+```
+docker run -p 4000:80 friendlyhello
+```
+
+#### test
+
+```
+curl http://localhost:4000
+```
+
+#### stop
+
+```
+docker container stop 1fa4ab2cf395
+```
+
+-----
+
+## 引深: 生命周期
+
+----
+
+![](2019-08-03-17-54-55.png)
+
+----
+
+运行
+```
+docker run xxx
+```
+
+----
+
+
+暂停
+```
+docker pause xxx
+```
+
+恢复
+```
+docker unpause xxx
+```
+
+----
+
+停止
+```
+docker stop xxx
+```
+
+重启
+```
+docker restart xxx
+```
+
+----
+
+终止
+
+```
+docker kill xxx
+```
+
+-----
+
+# 镜仓仓库
+
+----
+
+
+![](2019-07-24-19-47-12.png)
+
+
+----
+
+#### 打标签
+
+----
+
+格式
+
+```
+docker tag image username/repository:tag
+```
+
+----
+
+例子
+
+```
+docker tag friendlyhello gordon/get-started:part2
+```
+
+----
+
+
+推送
+
+```
+docker push username/repository:tag
+```
+
+运行
+
+```
+docker run -p 4000:80 username/repository:tag
+```
+
+-----
+
+
+# 常用Dockerfile中的指令
+
+
+----
+
+## 添加文件
+
+----
+
+
+#### COPY 指令
+
+```bash
+COPY [--chown=<user>:<group>] <src>... <dst>
+COPY [--chown=<user>:<group>] ["<src1>",... "<dst>"]
+```
+
+----
+ 
+
+#### COPY 例子
+
+```
+COPY package.json /usr/src/app/
+```
+
+----
+
+ 
+
+#### 源路径匹配模式
+
+```
+COPY hom* /mydir/
+COPY hom?.txt /mydir/
+```
+
+---- 
+
+#### 模式匹配
+
+```
+pattern:
+    { term }
+term:
+    '*'         匹配0或多个非路径分隔符的字符
+    '?'         匹配1个非路径分隔符的字符
+    '[' [ '^' ] { character-range } ']'  
+                  字符组（必须非空）
+    c           匹配字符c（c != '*', '?', '\\', '['）
+    '\\' c      匹配字符c
+character-range:
+    c           匹配字符c（c != '\\', '-', ']'）
+    '\\' c      匹配字符c
+    lo '-' hi   匹配区间[lo, hi]内的字符
+```
+
+---- 
+
+
+#### 所有权
+
+使用 COPY 指令，源文件的各种元数据都会保留。比如读、写、执行权限、文件变更时间等。这个特性对于镜像定制很有用。特别是构建相关文件都在使用 Git 进行管理的时候。
+
+在使用该指令的时候还可以加上 --chown=<user>:<group> 选项来改变文件的所属用户及所属组。
+
+----
+
+#### 带有所有权的例子
+
+
+```
+COPY --chown=dameng:mf files* /mydir/
+```
+
+----
+
+#### ADD 指令
+
+ADD 和 COPY 类似，但是支持URL, 同时如果是gzip, bzip2 以及 xz等的压缩文件，会自动解压
+
+----
+
+
+#### 三种运行
+
+
+```
+RUN apt install htop
+
+CMD env
+
+ENTRYPOINT ["sh", "-c", "env"]
+```
+
+
+----
+
+####  引深: 进程模型
+
+
+----
+
+![](2019-08-03-19-15-41.png)
+
+----
+
+![](2019-08-03-19-17-41.png)
+
+----
+
+![](2019-08-03-19-18-30.png)
+
+-----
+
+#### Quiz
+
+- 使用容器来启动Nginx
+
+----
+
+
+## 环境变量
+
+----
+
+#### ENV 指令
+
+```
+ENV <key> <value>
+ENV <key1>=<value1> <key2>=<value2>...
+```
+
+----
+
+
+#### ARG 指令
+
+```
+ARG <key>[=<value>]
+```
+
+----
+
+## 工作目录
+----
+
+#### WORKDIR 指令
+
+
+```
+WORKDIR  <dir>
+```
+
+----
+
+
+## 卷
+----
+
+#### VOLUME 指令
+
+
+```
+VOLUME ["<dir1>", "<dir2>"...]
+VOLUME <dir>
+```
+
+----
+
+
+## 端口暴露
+
+----
+
+#### EXPOSE 指令
+
+
+```
+EXPOSE <port1> [<port2>...]
+```
+
+----
+
+
+## 用户相关
+
+----
+
+#### USER 指令
+
+```
+USER <username>[:<usergroup>]
+```
+
+----
+
+#### USER 示例
+
+```
+RUN groupadd -r redis && useradd -r -g redis redis
+USER redis
+RUN [ "redis-server" ]
+```
+
+----
+
+
+## 健康检查
+
+----
+
+#### HEALTHCHECK 指令
+
+```
+HEALTHCHECK [OPTIONS] CMD command
+```
+
+----
+
+#### HEALTHCHECK 示例
+
+```
+HEALTHCHECK --interval=5s --timeout=3s CMD curl --fail http://localhost:5000/ || exit 1
+```
+
+
+-----
+
+# 引深: volume
+
+----
+
+![](2019-08-03-19-30-54.png)
+
+----
+
+创建卷
+
+```
+docker volume create my-vol
+```
+
+----
+
+列出卷
+
+```
+docker volume ls
+```
+
+----
+
+审查卷
+
+```
+docker volume inspect my-vol
+```
+
+----
+
+删除卷
+
+```
+docker volume rm my-vol
+```
+
+----
+
+run with volume
+
+
+```
+docker run -d \
+  --name devtest \
+  --mount source=myvol2,target=/app \
+  nginx:latest
+```
+
+```
+docker run -d \
+  --name devtest \
+  -v myvol2:/app \
+  nginx:latest
+```
+
+----
+
+readonly volume
+
+```
+docker run -d \
+  --name=nginxtest \
+  --mount source=nginx-vol,destination=/usr/share/nginx/html,readonly \
+  nginx:latest
+```
+
+```
+docker run -d \
+  --name=nginxtest \
+  -v nginx-vol:/usr/share/nginx/html:ro \
+  nginx:latest
+```
+
+
+-----
+
+# 引深: network
+
+----
+
+<div class="background" style="max-height: 600px; overflow-y: scroll;">
+![](2019-08-03-19-41-59.png)
+</div>
+
+----
+
+![](2019-08-03-19-42-51.png)
+
+----
+
+创建网络（桥接）
+```
+docker network create -d bridge mybridge
+```
+
+----
+
+列出网络
+
+```
+docker network ls
+```
+
+----
+
+审查网络
+
+```
+docker network inspect mybridge
+```
+
+----
+
+删除网络
+```
+docker network rm mybridge
+```
+
+----
+
+run with network
+
+```
+docker run  --rm --name redis  --net mybridge redis
+```
+
+-----
+
+
+# 实战3: 健康检查配置
+
+-----
+
+## Try it Out (3)
+带有健康检查的尝试
+
+
+----
+
+
+app.py
+
+```python
+from flask import Flask
+import os
+import socket
+
+app = Flask(__name__)
+
+@app.route("/")
+def hello():
+    html = "<h3>Hello {name}!</h3>" \
+           "<b>Hostname:</b> {hostname}" 
+    return html.format(name=os.getenv("NAME", "world"), 
+                       hostname=socket.gethostname())
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=5000)
+```
+
+----
+
+Dockerfile
+
+```
+FROM python:3.7-slim
+
+WORKDIR /app
+
+COPY . /app
+
+COPY sources.list /etc/apt/
+RUN apt update && apt install -y curl
+RUN pip install flask -i https://mirrors.aliyun.com/pypi/simple  --trusted-host mirrors.aliyun.com 
+EXPOSE 5000
+ENV NAME World
+
+HEALTHCHECK --interval=5s --timeout=3s CMD curl --fail http://localhost:5000/ || exit 1
+
+CMD ["python", "app.py"]
+```
+
+----
+
+sources.list
+```
+deb http://mirrors.163.com/debian/ buster main non-free contrib
+deb http://mirrors.163.com/debian/ buster-updates main non-free contrib
+deb http://mirrors.163.com/debian/ buster-backports main non-free contrib
+deb-src http://mirrors.163.com/debian/ buster main non-free contrib
+deb-src http://mirrors.163.com/debian/ buster-updates main non-free contrib
+deb-src http://mirrors.163.com/debian/ buster-backports main non-free contrib
+deb http://mirrors.163.com/debian-security/ buster/updates main non-free contrib
+deb-src http://mirrors.163.com/debian-security/ buster/updates main non-free contrib
+```
+
+
+----
+
+run
+
+```
+docker build -t friendlyhello:v2 .
+docker run --rm --name demo -p 5000:5000 friendlyhello:v2
+docker inspect --format='{{json .State.Health}}' demo | jq 
+```
+
+
+-----
+
+# 实战4: 链接redis
+
+-----
+
+## Try it Out (4)
+连接redis
+
+----
+
+app.py
+
+```python
+from flask import Flask
+from redis import Redis, RedisError
+import os
+import socket
+
+# Connect to Redis
+redis = Redis(host="redis", db=0, socket_connect_timeout=2, socket_timeout=2)
+
+app = Flask(__name__)
+
+@app.route("/")
+def hello():
+    try:
+        visits = redis.incr("counter")
+    except RedisError:
+        visits = "<i>cannot connect to Redis, counter disabled</i>"
+
+    html = "<h3>Hello {name}!</h3>" \
+           "<b>Hostname:</b> {hostname}<br/>" \
+           "<b>Visits:</b> {visits}"
+    return html.format(name=os.getenv("NAME", "world"), hostname=socket.gethostname(), visits=visits)
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=5000)
+```
+
+----
+
+```Dockerfile
+
+FROM python:3.7-slim
+
+WORKDIR /app
+
+COPY . /app
+
+COPY sources.list /etc/apt/
+RUN apt update && apt install -y curl && apt install -y iputils-ping
+RUN pip install flask redis -i https://mirrors.aliyun.com/pypi/simple  --trusted-host mirrors.aliyun.com 
+EXPOSE 5000
+ENV NAME World
+
+HEALTHCHECK --interval=5s --timeout=3s CMD curl --fail http://localhost:5000/ || exit 1
+
+CMD ["python", "app.py"]
+
+```
+
+----
+
+
+sources.list
+```
+deb http://mirrors.163.com/debian/ buster main non-free contrib
+deb http://mirrors.163.com/debian/ buster-updates main non-free contrib
+deb http://mirrors.163.com/debian/ buster-backports main non-free contrib
+deb-src http://mirrors.163.com/debian/ buster main non-free contrib
+deb-src http://mirrors.163.com/debian/ buster-updates main non-free contrib
+deb-src http://mirrors.163.com/debian/ buster-backports main non-free contrib
+deb http://mirrors.163.com/debian-security/ buster/updates main non-free contrib
+deb-src http://mirrors.163.com/debian-security/ buster/updates main non-free contrib
+````
+
+----
+
+
+```bash
+docker build -t friendlyhello:v3 . 
+docker network create -d bridge mynet
+docker run  --rm --name flask -p 5000:5000 --net mynet friendlyhello:v3
+docker run  --rm --name redis  --net mynet redis
+```

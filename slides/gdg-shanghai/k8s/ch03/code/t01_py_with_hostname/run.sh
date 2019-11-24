@@ -1,0 +1,1 @@
+docker run --rm --name myapp -p 5000:5000 -e HOSTNAME=`hostname` friendlyhello:v4
