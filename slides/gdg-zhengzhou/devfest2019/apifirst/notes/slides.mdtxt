@@ -2,49 +2,118 @@
 
 for building products
 
-创作中...
+author: dameng@DaoCloud
 
-author: dameng
+----
+
+## API驱动开发
 
 
 ----
 
-## Design Fisrt
-
-then 
-
-## Code
+- 微服务
+- 敏捷开发流程
+- API设计（但是这个slides不是讲restful的）
 
 -----
 
 
-先看一下swagger官方对于APIFirst的阐述
+### 内容概要
+
+
+- API-First Approach的定义
+- 和TDD的相似之处
+- 微服务时代的意义
+- 相关工具与框架的介绍
+- python实战上手
+- 更多
+
 
 ----
 
-An API-first approach means that for any given development project, your APIs are treated as “first-class citizens.” That everything about a project revolves around the idea that the end product will be consumed by mobile devices, and that APIs will be consumed by client applications. 
+
+时间有限，这里面的例子都很直白，不够复杂
+
+
+-----
+
+关于API-Fisrt approach的描述
 
 ----
 
-An API-first approach involves developing APIs that are consistent and reusable, which can be accomplished by using an API description language to establish a contract for how the API is supposed to behave.  
+An API-first approach means that for any given development project, your APIs are treated as “<b>first-class citizens</b>.” 
 
 ----
 
-Establishing a contract involves spending more time thinking about the design of an API. It also often involves additional planning and collaboration with the stakeholders providing feedback on the design of an API before any code is written.
+An API-first approach involves developing APIs that are consistent and reusable, which can be accomplished by using <b>an API description language</b> to establish a contract for how the API is supposed to behave.  
+
+----
+
+Establishing a contract involves spending more time <b>thinking about the design</b> of an API. 
+
+----
+
+It also often involves additional planning and collaboration with the stakeholders providing feedback on the design of an API <b>before any code is written</b>.
 
 ----
 
 - API as first Citizens
-- consistent and reusable
 - using an description language
 - making a contract 
 - thinking more of design
+- before code is written
+
+----
+
+
+### Design Fisrt
+ 
+### Development Follows
 
 -----
 
-再让我们看一下TDD的一个例子
+在开发过程中，有一个类似的概念， <b>TDD</b>
 
 ----
+
+Test-Driven-Development
+
+----
+
+我们先看一下TDD的一个非常例子
+
+----
+
+demo1: 设计一个“加法器”
+
+----
+
+
+正向的思路
+
+```python
+def add(x, y):
+    return x + y
+```
+
+
+----
+
+
+但是按照TDD的要求我们应该先写测试！
+
+----
+
+我们应该定义好的是
+
+- 一个计算方法
+- 接受两个参数 x 和 y
+- 正常情况下应该返回这两个数之和
+
+
+----
+
+测试代码如下
 
 ```python
 def test_calc_add_should_equal_to_x_plus_y(x, y):
@@ -55,6 +124,8 @@ def test_calc_add_should_equal_to_x_plus_y(x, y):
 
 ----
 
+具体的实现
+
 ```python
 class Calculator:
     def add(self, x, y):
@@ -63,6 +134,7 @@ class Calculator:
 
 ----
 
+完整的例子
 
 ```python
 class Calculator:
@@ -81,12 +153,16 @@ if __name__ == "__main__":
 ----
 
 - Design first
-- Implementation follows
-
+- Development follows
 
 -----
 
-How about the API ?
+那么如果类似的概念应用到API过程中呢 ?
+
+
+----
+
+demo2: 设计一个简单的API
 
 ----
 
@@ -96,6 +172,8 @@ How about the API ?
 
 ----
 
+请求定义
+
 ```
 Request:
 
@@ -103,6 +181,9 @@ GET http://127.0.0.1/
 ```
 
 ----
+
+
+返回定义
 
 ```
 Response:
@@ -114,6 +195,33 @@ Response:
 
 ----
 
+让我们还是用TDD的思想来开发，先写测试，再实现具体的逻辑
+
+
+----
+
+测试的代码
+
+```python
+def test_should_return_hello_world_when_access_index():
+    assert 'Hello World' == index().get('data')
+```
+
+----
+
+具体的实现
+
+```python
+def index():
+    return {
+        'data': 'Hello World'
+    }
+```
+
+----
+
+
+完整的逻辑
 
 ```python
 def index():
@@ -130,6 +238,9 @@ if __name__ == "__main__":
 
 
 ----
+
+
+绑定到flask
 
 ```
 
@@ -158,21 +269,45 @@ if __name__ == "__main__":
 
 ----
 
-
-```
-需求 -> 开发 -> 测试
-
-需求 -> 测试 -> 开发 -> 测试 -> ...
-
-需求 -> 设计 -> 测试 -> 开发 -> 测试 -> ....
-```
+流程上的改变
 
 ----
 
-- 自上而下的分工更加明确
-- 环节更明确， 局部并行更加容易
+
+## 需求 -> 开发 -> 测试(功能测试)
+
+
+----
+
+
+
+### 需求 -> 测试(单元测试+部分功能测试) 
+### -> 开发 -> 测试(功能测试) 
+
+
+----
+
+
+### 需求 -> 测试(单元测试+部分功能测试) 
+### -> 开发(核心逻辑) -> 开发(绑定web接口) 
+### -> 测试(功能测试)
+
+
+----
+
+如果我们把绑定web接口这一步骤单独提出来并前置呢？
 
 -----
+
+## 微服务时代的来临
+
+----
+
+## microservices 
+vs 
+## monolithic
+
+----
 
 ![远古时代](./8.jpeg)
 
@@ -188,35 +323,27 @@ if __name__ == "__main__":
 
 ![远古时代](./11.jpeg)
 
-----
-
-## microservices 
-vs 
-## monolithic
 
 ----
 
+## 敏捷流程与DevOps的兴起
 
-当我们拆分单体应用为微服务时，如何避坑？
+----
+
+开发与构建流程的拆分
 
 ----
 
 
-- Minimize Dependency Back to the Monolith
-- Split Sticky Capabilities Early
-- Decouple Vertically and Release the Data Early
-- Decouple What is Important to the Business and Changes Frequently
-- Decouple Capability and not Code
-- Go Macro First, then Micro
-- Migrate in Atomic Evolutionary Steps
+![](2019-11-30-14-03-45.png)
 
 ----
 
-除了这些准则，真正落地时都需要设计好模块与模块之间的API
+当我们采用微服务，敏捷开发构建流程的时候，API设计变得更加重要
 
 -----
 
-API的设计语言
+## API的设计语言
 
 ----
 
@@ -262,10 +389,6 @@ vs
 
 ![](2019-11-25-00-08-59.png)
 
-----
-
-最终的赢家算是OpenAPI
-
 -----
 
 ## OpenAPI
@@ -276,14 +399,22 @@ vs
 
 ----
 
-OpenAPI Specification (formerly Swagger Specification) is an API description format for REST APIs. An OpenAPI file allows you to describe your entire API, including:
+OpenAPI Specification (formerly Swagger Specification) is an API description format for REST APIs. 
+
+----
+
+An OpenAPI file allows you to describe your entire API, including:
 
 - Available endpoints (/users) and operations on each endpoint (GET /users, POST /users)
 Operation parameters Input and output for each operation
 - Authentication methods
-- Contact information, license, terms of use and other information.
+- Contact information, license, terms of use and other information
 
-API specifications can be written in YAML or JSON. The format is easy to learn and readable to both humans and machines. The complete OpenAPI Specification can be found on GitHub: OpenAPI 3.0 Specification
+
+----
+
+- API specifications can be written in YAML or JSON 
+- The format is easy to learn and readable to both humans and machines. 
 
 ----
 
@@ -291,7 +422,11 @@ API specifications can be written in YAML or JSON. The format is easy to learn a
 
 ----
 
-Swagger is a set of open-source tools built around the OpenAPI Specification that can help you design, build, document and consume REST APIs. The major Swagger tools include:
+Swagger is a set of open-source tools built around the OpenAPI Specification that can help you design, build, document and consume REST APIs. 
+
+----
+
+The major Swagger tools include:
 
 - Swagger Editor – browser-based editor where you can write OpenAPI specs.
 - Swagger UI – renders OpenAPI specs as interactive API documentation.
@@ -299,7 +434,14 @@ Swagger is a set of open-source tools built around the OpenAPI Specification tha
 
 ----
 
-## Definition
+OpenAPI规范的定义
+
+----
+
+
+----
+
+## 格式的定义
 
 ----
 
@@ -310,20 +452,706 @@ Swagger is a set of open-source tools built around the OpenAPI Specification tha
 
 ----
 
-## Specification
+## 格式的规范
+
+----
 
 - Versions
 - Format
 - Document Structure
 - Data Types
+
+----
+
 - Rich Text Formatting
 - Relative References in URLs
 - Schema
 - Specification Extensions
 - Security Filtering
 
+----
+
+我们重点关注一下Data Types和Schema这两个字段
+
+----
+
+## Data Types
+
+----
+
+Primitive data types in the OAS are based on the types supported by the JSON Schema Specification Wright Draft 00.
+
+----
+
+| type    | format    | Comments                          |
+|---------|-----------|-----------------------------------|
+| integer | int32     | signed  32 bits                   |
+| integer | int64     | signed 64 bits (a.k.a long)       |
+| number  | float     |                                   |
+| number  | double    |                                   |
+| boolean |           |                                   |
+
+----
+
+| type    | format    | Comments                          |
+|---------|-----------|-----------------------------------|
+| string  |           |                                   |
+| string  | byte      | base64 encoded characters         |
+| string  | binary    | any sequence of octets            |
+| string  | date      | As defined by full-date - RFC3339 |
+| string  | date-time | As defined by date-time - RFC3339 |
+| string  | password  | A hint to UIs to obscure input.   |
+
+----
+
+## Schema
+
+----
+
+
+- OpenAPI Object
+- Info Object
+- Contact Object
+- License Object
+- Server Object
+- Server Variable Object
+
+----
+
+
+- Components Object
+- Paths Object
+- Path Item Object
+- Operation Object
+- External Documentation Object
+- Parameter Object
+
+----
+
+
+- Request Body Object
+- Media Type Object
+- Encoding Object
+- Responses Object
+- Response Object
+
+
+----
+
+
+- Callback Object
+- Example Object
+- Link Object
+- Header Object
+- Tag Object
+
+----
+
+
+- Reference Object
+- Schema Object
+- Discriminator Object
+- XML Object
+
+----
+
+
+- Security Scheme Object
+- OAuth Flows Object
+- OAuth Flow Object
+- Security Requirement Object
+
+
+----
+
+而在Schema中最常甬道的其实就是info，path了
+
+----
+
+info object用来描述对应的spec的基础配置信息
+
+----
+
+components object
+
+----
+
+### Info 对象
+
+----
+
+```yaml
+title: Sample Pet Store App
+description: This is a sample server for a pet store.
+termsOfService: http://example.com/terms/
+contact:
+  name: API Support
+  url: http://www.example.com/support
+  email: support@example.com
+license:
+  name: Apache 2.0
+  url: https://www.apache.org/licenses/LICENSE-2.0.html
+version: 1.0.1
+```
+
+----
+
+```json
+{
+  "title": "Sample Pet Store App",
+  "description": "This is a sample server for a pet store.",
+  "termsOfService": "http://example.com/terms/",
+  "contact": {
+    "name": "API Support",
+    "url": "http://www.example.com/support",
+    "email": "support@example.com"
+  },
+  "license": {
+    "name": "Apache 2.0",
+    "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+  },
+  "version": "1.0.1"
+}
+```
+
+----
+
+### Path 以及 Path Item 对象
+
+----
+
+path 对象下面挂着一些Path Item对象
+
+----
+
+```
+/{path}:	
+  Path Item 
+```
+
+----
+
+
+```yaml
+/pets/{id}:
+  Path Item
+```
+
+
+----
+
+```yaml
+get:
+  description: Returns pets based on ID
+  summary: Find pets by ID
+  operationId: getPetsById
+  responses:
+    '200':
+      description: pet response
+      content:
+        '*/*' :
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Pet'
+    default:
+      description: error payload
+      content:
+        'text/html':
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+parameters:
+- name: id
+  in: path
+  description: ID of pet to use
+  required: true
+  schema:
+    type: array
+    style: simple
+    items:
+      type: string  
+```
+
+----
+
+```json
+{
+  "get": {
+    "description": "Returns pets based on ID",
+    "summary": "Find pets by ID",
+    "operationId": "getPetsById",
+    "responses": {
+      "200": {
+        "description": "pet response",
+        "content": {
+          "*/*": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Pet"
+              }
+            }
+          }
+        }
+      },
+      "default": {
+        "description": "error payload",
+        "content": {
+          "text/html": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorModel"
+            }
+          }
+        }
+      }
+    }
+  },
+  "parameters": [
+    {
+      "name": "id",
+      "in": "path",
+      "description": "ID of pet to use",
+      "required": true,
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "style": "simple"
+    }
+  ]
+}
+```
+
+----
+
+这里要额外注意两点
+
+- $ref 引用的是Schema对象
+- operationId 是指向具体对应处理函数的字串，区分大小写要求唯一
+  
+----
+
+### Schema 对象
+
+----
+
+Pet的Schema定义
+
+```yaml
+components:
+  schemas:
+    Pet:
+      type: object
+      discriminator:
+        propertyName: petType
+      properties:
+        name:
+          type: string
+        petType:
+          type: string
+      required:
+      - name
+      - petType
+    Cat:  ## "Cat" will be used as the discriminator value
+      description: A representation of a cat
+      allOf:
+      - $ref: '#/components/schemas/Pet'
+      - type: object
+        properties:
+          huntingSkill:
+            type: string
+            description: The measured skill for hunting
+            enum:
+            - clueless
+            - lazy
+            - adventurous
+            - aggressive
+        required:
+        - huntingSkill
+    Dog:  ## "Dog" will be used as the discriminator value
+      description: A representation of a dog
+      allOf:
+      - $ref: '#/components/schemas/Pet'
+      - type: object
+        properties:
+          packSize:
+            type: integer
+            format: int32
+            description: the size of the pack the dog is from
+            default: 0
+            minimum: 0
+        required:
+        - packSize
+```
+
+----
+
+
+```json
+{
+  "components": {
+    "schemas": {
+      "Pet": {
+        "type": "object",
+        "discriminator": {
+          "propertyName": "petType"
+        },
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "petType": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "petType"
+        ]
+      },
+      "Cat": {
+        "description": "A representation of a cat. Note that `Cat` will be used as the discriminator value.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Pet"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "huntingSkill": {
+                "type": "string",
+                "description": "The measured skill for hunting",
+                "default": "lazy",
+                "enum": [
+                  "clueless",
+                  "lazy",
+                  "adventurous",
+                  "aggressive"
+                ]
+              }
+            },
+            "required": [
+              "huntingSkill"
+            ]
+          }
+        ]
+      },
+      "Dog": {
+        "description": "A representation of a dog. Note that `Dog` will be used as the discriminator value.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Pet"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "packSize": {
+                "type": "integer",
+                "format": "int32",
+                "description": "the size of the pack the dog is from",
+                "default": 0,
+                "minimum": 0
+              }
+            },
+            "required": [
+              "packSize"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
+```
+
+----
+
+ErrorModel的Schema定义
+
+----
+
+```yaml
+components:
+  schemas:
+    ErrorModel:
+      type: object
+      required:
+      - message
+      - code
+      properties:
+        message:
+          type: string
+        code:
+          type: integer
+          minimum: 100
+          maximum: 600
+    ExtendedErrorModel:
+      allOf:
+      - $ref: '#/components/schemas/ErrorModel'
+      - type: object
+        required:
+        - rootCause
+        properties:
+          rootCause:
+            type: string
+```
+
+----
+
+```json
+
+  "components": {
+    "schemas": {
+      "ErrorModel": {
+        "type": "object",
+        "required": [
+          "message",
+          "code"
+        ],
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer",
+            "minimum": 100,
+            "maximum": 600
+          }
+        }
+      },
+      "ExtendedErrorModel": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ErrorModel"
+          },
+          {
+            "type": "object",
+            "required": [
+              "rootCause"
+            ],
+            "properties": {
+              "rootCause": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
+```
+
 -----
 
-创作中。。。
+## API-First Development
+
+----
+
+python中使用swagger的方式
+
+- 先写代码，生成swagger的spec，挂载到静态serve的swagger ui下
+- 写代码时绑定swagger相关的配置，swagger的spec是动态生成的
+- 先设计spec，再编写相应的代码（可以部分动态生成）
+
+----
+
+最后一种方式是API-First对应的方式
+
+----
+
+实战
+
+----
+
+为PetStore设计一个简单的获取宠物信息的API
+
+----
+
+step 1
+
+----
+
+
+产品设计，需求分析（略过）
+
+----
+
+step 2
+
+----
+
+设计API的spec
+
+----
+
+```yaml
+openapi: "3.0.0"
+
+info:
+  title: Hello Pet
+  version: "1.0"
+servers:
+  - url: http://localhost:9090/v1.0
+
+paths:
+  /pets/{pet_id}:
+    get:
+      description: Returns pets based on ID
+      summary: Find pets by ID
+      operationId: app.get_pets_by_id
+      responses:
+        '200':
+          description: pet response
+          content:
+            'application/json' :
+              schema:
+                type: object
+                $ref: '#/components/schemas/Pet'
+    parameters:
+    - name: pet_id
+      in: path
+      description: ID of pet to use
+      required: true
+      schema:
+        type: integer
+components:
+  schemas:
+    Pet:
+      type: object
+      required:
+      - petType
+      properties:
+        petType:
+          type: string
+      discriminator:
+        propertyName: petType
+        mapping:
+          dog: Dog
+          cat: Cat
+          lizard: Lizard
+    Cat:
+      allOf:
+      - $ref: '#/components/schemas/Pet'
+      - type: object
+        # all other properties specific to a `Cat`
+        properties:
+          meow:
+            type: string
+    Dog:
+      allOf:
+      - $ref: '#/components/schemas/Pet'
+      - type: object
+        # all other properties specific to a `Dog`
+        properties:
+          bark:
+            type: string
+    Lizard:
+      allOf:
+      - $ref: '#/components/schemas/Pet'
+      - type: object
+        # all other properties specific to a `Lizard`
+        properties:
+          lovesRocks:
+            type: boolean
+```
+
+----
+
+step 3
+
+----
+
+测试编写（略过）
+
+----
+
+step 4
+
+----
+
+开发业务逻辑
+
+----
+
+```python
+def get_pets_by_id(pet_id: int) -> list:
+    return [{
+                'name': 'lucky',
+                'petType': 'dog',
+                'bark': 'woof!'
+            }, 
+            {
+                'name': 'kitty',
+                'petType': 'cat',
+                'meow': 'meow!'
+            },
+            {
+                'name': 'jack',
+                'petType': 'lizard',
+                'loveRocks': True
+            }][pet_id%3]
+```
+
+----
+
+step 5
+
+----
+
+安装web依赖
+
+----
+
+```
+pip install connexion flask_cors swagger-ui-bundle
+```
+
+----
+
+绑定web路由
+
+
+----
+
+```
+
+import connexion
+from flask_cors import CORS
+
+if __name__ == '__main__':
+    app = connexion.FlaskApp(__name__, port=9090, specification_dir='./')
+    app.add_api('spec.yaml', arguments={'title': 'Simple Pet'})
+    CORS(app.app)
+    app.run()
+```
+
+----
+
+
+- 设计（需求，原型，API）
+- 测试
+- 开发
+
+
+-----
+
+更多
+
+----
+
+
+- 集中的api管理，测试平台
+- 文档站管理平台
+- 带有rbac的网关
+- 链路管理，日志追踪平台
+- .....
+
+
+-----
+
+# Thanks !
 
 
