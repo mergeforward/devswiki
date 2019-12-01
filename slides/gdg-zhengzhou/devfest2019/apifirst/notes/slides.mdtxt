@@ -80,7 +80,7 @@ Test-Driven-Development
 
 ----
 
-我们先看一下TDD的一个非常例子
+我们先看一下TDD的一个非常简单的例子
 
 ----
 
@@ -163,12 +163,6 @@ if __name__ == "__main__":
 ----
 
 demo2: 设计一个简单的API
-
-----
-
-
-先设计一个简单的API
-
 
 ----
 
@@ -572,10 +566,6 @@ info object用来描述对应的spec的基础配置信息
 
 ----
 
-components object
-
-----
-
 ### Info 对象
 
 ----
@@ -731,7 +721,9 @@ parameters:
 - $ref 引用的是Schema对象
 - operationId 是指向具体对应处理函数的字串，区分大小写要求唯一
   
+
 ----
+
 
 ### Schema 对象
 
