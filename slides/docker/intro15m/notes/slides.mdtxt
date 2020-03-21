@@ -1,0 +1,411 @@
+## Docker in 15 minutes
+
+author: Fanchao MENG
+
+-----
+
+
+## 大纲简要
+
+- Docker 前世今生
+- Docker 上手指南
+- Docker 架构设计
+- Docker 幕后技术
+
+-----
+
+## 前世今生
+
+----
+
+2013 年 3 月 15 日，在加利福尼亚州圣克拉拉召开的 Python 开发者大会上，dotCloud 的创始人兼首席执行官 Solomon Hvkes 在一场仅五分钟的微型演讲中，首次提出了 Docker 这一概念。当时，仅约 40 人（除 dotCloud 内部人员）获得了使用 Docker 的机会。
+
+----
+
+
+<image src="2019-08-03-09-27-10.png" style="height:600px">
+</image>
+
+----
+
+虽然是在PyCon大会发布的小工具，但其实它是用Golang来编写的。
+
+----
+
+### Docker是什么？
+
+----
+
+- 开发者角度
+  - 提供了一种“全新”的应用发布模式
+  - 自带了Provision工具
+- 运维人员角度
+  - “轻量级”的虚拟机
+  - 像管理“app”一样管理后端服务
+- 系统管理员角度
+  - 一种独立进程管理方案
+  - 可以对指定的进程设定限制
+
+----
+
+docker实际是对应了一种现代的虚拟化技术。
+如果你依旧不清楚docker是什么，我们可以先把它当成一种轻量级“虚拟机”（尽管这么说是不对的）
+
+----
+
+
+![](2019-07-21-21-18-58.png)
+
+
+----
+
+
+![](2019-07-25-20-03-58.png)
+
+
+----
+
+
+![](2019-09-22-22-37-31.png)
+
+----
+
+
+<image src="k8s.png" style="height:400px">
+</image>
+
+
+-----
+
+## 上手指南
+
+----
+
+这里假定我们已经安装好了docker，要使来运行我们的程序
+
+----
+
+```bash
+docker run hello-world
+```
+
+
+```bash
+Unable to find image 'hello-world:latest' locally
+latest: Pulling from library/hello-world
+1b930d010525: Pull complete 
+Digest: sha256:92c7f9c92844bbbb5d0a101b22f7c2a7949e40f8ea90c8b3bc396879d95e899a
+Status: Downloaded newer image for hello-world:latest
+
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+
+To generate this message, Docker took the following steps:
+ 1. The Docker client contacted the Docker daemon.
+ 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+    (amd64)
+ 3. The Docker daemon created a new container from that image which runs the
+    executable that produces the output you are currently reading.
+ 4. The Docker daemon streamed that output to the Docker client, which sent it
+    to your terminal.
+
+To try something more ambitious, you can run an Ubuntu container with:
+ $ docker run -it ubuntu bash
+
+Share images, automate workflows, and more with a free Docker ID:
+ https://hub.docker.com/
+
+For more examples and ideas, visit:
+ https://docs.docker.com/get-started/
+```
+
+----
+
+```bash
+docker run -d -P daocloud.io/daocloud/dao-2048
+```
+
+<image src="2020-03-21-18-53-40.png" style="height:400px">
+</image>
+
+----
+
+让我们尝试着编写一个简单的python的app, 并运行发布
+
+----
+
+- 编写程序及Dockerfile
+- 打包镜像
+- 上传镜像
+- 拉取镜像并发布
+
+----
+
+
+```python
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route("/<name>")
+def hello(name):
+    html = "<h3>Hello {name}!</h3>" 
+    return html.format(name=name)
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=5000)
+```
+
+```bash
+python app.py
+```
+
+
+![](2020-03-21-19-00-29.png)
+
+
+----
+
+如何发布呢？
+
+----
+
+```yaml
+
+FROM python:3.7-slim
+WORKDIR /app
+COPY . /app
+RUN pip install flask -i https://mirrors.aliyun.com/pypi/simple  --trusted-host mirrors.aliyun.com 
+EXPOSE 500
+
+CMD ["python", "app.py"]
+```
+
+```
+docker build -t hello:v1 . 
+```
+
+----
+
+```bash
+Sending build context to Docker daemon  3.072kB
+Step 1/6 : FROM python:3.7-slim
+ ---> 69afd9568c9d
+Step 2/6 : WORKDIR /app
+ ---> Using cache
+ ---> 61a1e95188ad
+Step 3/6 : COPY . /app
+ ---> a5f20600c77d
+Step 4/6 : RUN pip install flask -i https://mirrors.aliyun.com/pypi/simple  --trusted-host mirrors.aliyun.com
+ ---> Running in e8184595f2df
+Looking in indexes: https://mirrors.aliyun.com/pypi/simple
+Collecting flask
+  Downloading https://mirrors.aliyun.com/pypi/packages/9b/93/628509b8d5dc749656a9641f4caf13540e2cdec85276964ff8f43bbb1d3b/Flask-1.1.1-py2.py3-none-any.whl (94 kB)
+Collecting itsdangerous>=0.24
+  Downloading https://mirrors.aliyun.com/pypi/packages/76/ae/44b03b253d6fade317f32c24d100b3b35c2239807046a4c953c7b89fa49e/itsdangerous-1.1.0-py2.py3-none-any.whl (16 kB)
+Collecting Werkzeug>=0.15
+  Downloading https://mirrors.aliyun.com/pypi/packages/ba/a5/d6f8a6e71f15364d35678a4ec8a0186f980b3bd2545f40ad51dd26a87fb1/Werkzeug-1.0.0-py2.py3-none-any.whl (298 kB)
+Collecting Jinja2>=2.10.1
+  Downloading https://mirrors.aliyun.com/pypi/packages/27/24/4f35961e5c669e96f6559760042a55b9bcfcdb82b9bdb3c8753dbe042e35/Jinja2-2.11.1-py2.py3-none-any.whl (126 kB)
+Collecting click>=5.1
+  Downloading https://mirrors.aliyun.com/pypi/packages/dd/c0/4d8f43a9b16e289f36478422031b8a63b54b6ac3b1ba605d602f10dd54d6/click-7.1.1-py2.py3-none-any.whl (82 kB)
+Collecting MarkupSafe>=0.23
+  Downloading https://mirrors.aliyun.com/pypi/packages/98/7b/ff284bd8c80654e471b769062a9b43cc5d03e7a615048d96f4619df8d420/MarkupSafe-1.1.1-cp37-cp37m-manylinux1_x86_64.whl (27 kB)
+Installing collected packages: itsdangerous, Werkzeug, MarkupSafe, Jinja2, click, flask
+Successfully installed Jinja2-2.11.1 MarkupSafe-1.1.1 Werkzeug-1.0.0 click-7.1.1 flask-1.1.1 itsdangerous-1.1.0
+Removing intermediate container e8184595f2df
+ ---> 354a6ac60bcb
+Step 5/6 : EXPOSE 5000
+ ---> Running in 499ce816b0d7
+Removing intermediate container 499ce816b0d7
+ ---> 5cabf0b15a0f
+Step 6/6 : CMD ["python", "app.py"]
+ ---> Running in e93f62dde208
+Removing intermediate container e93f62dde208
+ ---> be93e0d65731
+Successfully built be93e0d65731
+Successfully tagged hello:v1
+```
+
+----
+
+```bash
+docker run  --rm --name flask -P  hello:v1
+```
+
+```bash
+ * Serving Flask app "app" (lazy loading)
+ * Environment: production
+   WARNING: This is a development server. Do not use it in a production deployment.
+   Use a production WSGI server instead.
+ * Debug mode: off
+ * Running on http://0.0.0.0:5000/ (Press CTRL+C to quit)
+```
+
+----
+
+![](2020-03-21-19-50-29.png)
+
+![](2020-03-21-19-51-08.png)
+
+----
+
+![](2020-03-21-19-57-03.png)
+
+
+----
+
+
+push & pull
+
+```
+docker tag hello 172.16.100.1:7000/hello:v1
+docker push 172.16.100.1:7000/hello:v1
+docker pull 172.16.100.1:7000/hello:v1
+docker run -d -P 172.16.100.1:7000/hello:v1
+```
+
+-----
+
+## 架构设计
+
+----
+
+![](2019-07-22-19-36-22.png)
+
+-----
+
+## 幕后技术
+
+----
+
+
+- Namespace
+  - Linux提供的一种内核级别环境隔离的方法
+- Control Group
+  - 系​​​统​​​管​​​理​​​员​​​可​​​更​​​具​​​体​​​地​​​控​​​制​​​对​​​系​​​统​​​资​​​源​​​的​​​分​​​配​​​、​​​优​​​先​​​顺​​​序​​​、​​​拒​​​绝​​​、​​​管​​​理​​​和​​​监​​​控 
+- 存储
+- 网络
+
+----
+
+namespace
+
+----
+
+下面的程序在使用clone创建线程时, 使用了新的UTS空间和IPC空间 
+
+```c
+#define _GNU_SOURCE
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <stdio.h>
+#include <sched.h>
+#include <signal.h>
+#include <unistd.h>
+ 
+#define STACK_SIZE (1024 * 1024)
+static char container_stack[STACK_SIZE];
+ 
+char* const container_args[] = {
+    "/bin/bash",
+    NULL
+};
+ 
+int container_main(void* arg) {
+    printf("Container - inside the container!\n");
+    execv(container_args[0], container_args); 
+    printf("Something's wrong!\n");
+    return 1;
+}
+ 
+int main() {
+    printf("Parent - start a container!\n");
+    int container_pid = clone(container_main, container_stack+STACK_SIZE,  
+                              CLONE_NEWUTS | CLONE_NEWIPC  | SIGCHLD, NULL);
+    waitpid(container_pid, NULL, 0);
+    printf("Parent - container stopped!\n");
+    return 0;
+}
+```
+
+----
+
+- Mount  namespaces | CLONE_NEWNS 
+- UTS namespaces  |	CLONE_NEWUTS 
+- IPC namespaces | CLONE_NEWIPC  
+- PID namespaces  |	CLONE_NEWPID 
+- Network namespaces | CLONE_NEWNET  
+- User namespaces |	CLONE_NEWUSER 
+
+----
+
+control group
+
+----
+
+- cpu
+- memory
+- disk
+
+----
+
+```c
+int main(void) {
+    int i = 0;
+    for(;;) i++;
+    return 0;
+}
+```
+
+```
+PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND     
+3189 root      20   0    4196    736    656 R 99.6  0.1   0:23.13 deadloop
+```
+
+----
+
+
+- /sys/fs/cgroup/cpu/cpu.cfs_period_us 100000
+- /sys/fs/cgroup/cpu/cpu.cfs_quota_us -1
+
+----
+
+
+```
+echo 20000 > /sys/fs/cgroup/cpu/cpu.cfs_quota_us
+echo 3189 >> /sys/fs/cgroup/cpu/tasks
+```
+
+20000/100000 -> 20%
+
+```
+PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND     
+3189 root      20   0    4196    736    656 R 19.9  0.1   8:06.11 deadloop
+```
+
+----
+
+存储
+
+----
+
+![](2019-07-25-14-15-42.png)
+
+----
+
+网络
+
+----
+
+![](2019-08-10-20-48-53.png)
+
+----
+
+<div class="background" style="max-height: 600px; overflow-y: scroll;">
+![](2019-08-10-20-49-41.png)
+</div>
+
+-----
+
+Thanks
