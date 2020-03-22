@@ -232,7 +232,7 @@ Successfully tagged hello:v1
 ----
 
 ```bash
-docker run  --rm --name flask -P  hello:v1
+docker run  --rm --name flask -p 32777:5000 hello:v1
 ```
 
 ```bash
@@ -264,7 +264,7 @@ push & pull
 docker tag hello 172.16.100.1:7000/hello:v1
 docker push 172.16.100.1:7000/hello:v1
 docker pull 172.16.100.1:7000/hello:v1
-docker run -d -P 172.16.100.1:7000/hello:v1
+docker run -d -p 32777:5000 172.16.100.1:7000/hello:v1
 ```
 
 -----
