@@ -1,4 +1,5 @@
-## Docker in 15 minutes
+## Docker & k8s 
+## in 2 hours
 
 author: dameng
 
@@ -9,18 +10,35 @@ https://devs.wiki
 
 ## 大纲简要
 
-- Docker 前世今生
-- Docker 上手指南
-- Docker 架构设计
-- Docker 幕后技术
+----
 
------
+### Docker部分
 
-## 前世今生
+- Docker的前世今生
+- Docker快速体验
+- Docker的架构设计
+- 通过Dockerfile完成镜像的构建
+- Docker的幕后技术
 
 ----
 
-2013 年 3 月 15 日，在加利福尼亚州圣克拉拉召开的 Python 开发者大会上，dotCloud 的创始人兼首席执行官 Solomon Hvkes 在一场仅五分钟的微型演讲中，首次提出了 Docker 这一概念。当时，仅约 40 人（除 dotCloud 内部人员）获得了使用 Docker 的机会。
+### K8s部分
+
+- K8s 的由来
+- K8s 概念抽象
+- K8s 架构设计
+- K8s 安装
+- K8s 实操
+
+-----
+
+## Docker的前世今生
+
+----
+
+2013 年 3 月 15 日，在加利福尼亚州圣克拉拉召开的 Python 开发者大会上，
+dotCloud 的创始人兼首席执行官 Solomon Hvkes 在一场仅五分钟的微型演讲中，
+首次提出了 Docker 这一概念。当时，仅约 40 人（除 dotCloud 内部人员）获得了使用 Docker 的机会。
 
 ----
 
@@ -30,7 +48,9 @@ https://devs.wiki
 
 ----
 
-虽然是在PyCon大会发布的小工具，但其实它是用Golang来编写的。
+虽然是在PyCon大会发布的小工具，
+
+但其实它是用Golang来编写的。
 
 ----
 
@@ -41,16 +61,25 @@ https://devs.wiki
 - 开发者角度
   - 提供了一种“全新”的应用发布模式
   - 自带了Provision工具
+  - 提供了一致的打包方式
+  - 存储分层，增量式修改
 - 运维人员角度
   - “轻量级”的虚拟机
   - 像管理“app”一样管理后端服务
-- 系统管理员角度
   - 一种独立进程管理方案
   - 可以对指定的进程设定限制
 
 ----
 
+- Docker 是一种 Linux 容器管理引擎
+- Docker 是最火热的开源容器化项目之一
+- Docker 是一种实现打包、输送、运行任意应用的容器解决方案
+
+----
+
+
 docker实际是对应了一种现代的虚拟化技术。
+
 如果你依旧不清楚docker是什么，我们可以先把它当成一种轻量级“虚拟机”（尽管这么说是不对的）
 
 ----
@@ -58,28 +87,26 @@ docker实际是对应了一种现代的虚拟化技术。
 
 ![](2019-07-21-21-18-58.png)
 
-
 ----
 
+![](2020-06-30-15-34-33.png)
+
+----
 
 ![](2019-07-25-20-03-58.png)
 
-
 ----
 
-
-![](2019-09-22-22-37-31.png)
-
-----
-
-
-<image src="k8s.png" style="height:400px">
-</image>
-
+![](2020-06-30-15-24-08.png)
 
 -----
 
-## 上手指南
+
+## Docker快速上手
+
+----
+
+简单的HelloWorld
 
 ----
 
@@ -123,12 +150,121 @@ For more examples and ideas, visit:
 
 ----
 
+黑屏的不够过瘾，来个彩屏的吧
+
+----
+
 ```bash
 docker run -d -P daocloud.io/daocloud/dao-2048
 ```
 
 <image src="2020-03-21-18-53-40.png" style="height:400px">
 </image>
+
+
+----
+
+Quiz
+
+----
+
+参数-p, -it, -P 都分别有什么作用？
+
+-----
+
+## Docker的架构设计
+
+----
+
+
+![](2019-07-22-19-36-22.png)
+
+----
+
+- daemon
+- client
+- registry
+- objects
+
+----
+
+![](2020-06-30-16-13-50.png)
+
+----
+
+![](2020-06-30-16-43-20.png)
+
+----
+
+- containerd is a container runtime which can manage a complete container lifecycle - from image transfer/storage to container execution, supervision and networking.
+- container-shim handle headless containers, meaning once runc initializes the containers, it exits handing the containers over to the container-shim which acts as some middleman.
+
+----
+
+- runc is lightweight universal run time container, which abides by the OCI specification. runc is used by containerd for spawning and running containers according to OCI spec. It is also the repackaging of libcontainer.
+- grpc used for communication between containerd and docker-engine.
+- OCI maintains the OCI specification for runtime and images. The current docker versions support OCI image and runtime specs.
+
+----
+
+- containerd    supervisor
+- runc  container
+
+-----
+
+## Docker的安装
+
+----
+
+删除旧版
+
+```bash
+sudo apt-get remove docker docker-engine docker.io containerd runc
+```
+
+----
+
+设置repo，并配置GPG key
+
+```bash
+$ sudo apt-get update
+
+$ sudo apt-get install \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg-agent \
+    software-properties-common
+
+$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+$ sudo add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   $(lsb_release -cs) \
+   stable"
+```
+
+----
+
+安装docker
+
+```bash
+$ sudo apt-get update
+$ sudo apt-get install docker-ce docker-ce-cli containerd.io
+```
+
+----
+
+为当前用户赋能
+
+```
+$ sudo groupadd docker
+$ sudo usermod -aG docker $USER
+```
+
+-----
+
+## Dockerfile的编写
 
 ----
 
@@ -171,6 +307,7 @@ python app.py
 如何发布呢？
 
 ----
+
 
 ```yaml
 
@@ -257,6 +394,13 @@ docker run  --rm --name flask -p 32777:5000 hello:v1
 
 ----
 
+搭建Registry
+
+```bash
+docker run -d -p 5000:5000 --name registry registry:2
+```
+
+----
 
 push & pull
 
@@ -267,13 +411,6 @@ docker pull 172.16.100.1:7000/hello:v1
 docker run -d -p 32777:5000 172.16.100.1:7000/hello:v1
 ```
 
------
-
-## 架构设计
-
-----
-
-![](2019-07-22-19-36-22.png)
 
 -----
 
@@ -286,8 +423,10 @@ docker run -d -p 32777:5000 172.16.100.1:7000/hello:v1
   - Linux提供的一种内核级别环境隔离的方法
 - Control Group
   - 系​​​统​​​管​​​理​​​员​​​可​​​更​​​具​​​体​​​地​​​控​​​制​​​对​​​系​​​统​​​资​​​源​​​的​​​分​​​配​​​、​​​优​​​先​​​顺​​​序​​​、​​​拒​​​绝​​​、​​​管​​​理​​​和​​​监​​​控 
-- 存储
-- 网络
+- Union file systems
+  - 分层的文件系统
+- Container format
+  - libcontainer/runc
 
 ----
 
@@ -388,7 +527,7 @@ PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
 
 ----
 
-存储
+Union file system
 
 ----
 
@@ -396,18 +535,16 @@ PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
 
 ----
 
-网络
+container format
 
 ----
 
-![](2019-08-10-20-48-53.png)
+- namespaces
+- control groups
+- UnionFS
 
-----
-
-<div class="background" style="max-height: 600px; overflow-y: scroll;">
-![](2019-08-10-20-49-41.png)
-</div>
 
 -----
+
 
 Thanks
