@@ -1,0 +1,766 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <meta name="author" content="Makefile君">
+      
+      <link rel="shortcut icon" href="../../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-6.0.2">
+    
+    
+      
+        <title>Quick look - DevsWiki</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.38780c08.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../../assets/stylesheets/palette.3f72e892.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>body,input{font-family:"Roboto",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono",SFMono-Regular,Consolas,Menlo,monospace}</style>
+      
+    
+    
+    
+    
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+      
+  
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid" aria-label="Header">
+    <a href="../../../../.." title="DevsWiki" class="md-header-nav__button md-logo" aria-label="DevsWiki">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header-nav__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header-nav__title" data-md-component="header-title">
+      
+        <div class="md-header-nav__ellipsis">
+          <span class="md-header-nav__topic md-ellipsis">
+            DevsWiki
+          </span>
+          <span class="md-header-nav__topic md-ellipsis">
+            
+              Quick look
+            
+          </span>
+        </div>
+      
+    </div>
+    
+      <label class="md-header-nav__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active">
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" data-md-component="search-reset" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../../.." title="DevsWiki" class="md-nav__button md-logo" aria-label="DevsWiki">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    DevsWiki
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1" type="checkbox" id="nav-1">
+    
+    <label class="md-nav__link" for="nav-1">
+      目录
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="目录" data-md-level="1">
+      <label class="md-nav__title" for="nav-1">
+        <span class="md-nav__icon md-icon"></span>
+        目录
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-1" type="checkbox" id="nav-1-1">
+    
+    <label class="md-nav__link" for="nav-1-1">
+      技术博文
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="技术博文" data-md-level="2">
+      <label class="md-nav__title" for="nav-1-1">
+        <span class="md-nav__icon md-icon"></span>
+        技术博文
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-1-1" type="checkbox" id="nav-1-1-1">
+    
+    <label class="md-nav__link" for="nav-1-1-1">
+      机器学习相关
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="机器学习相关" data-md-level="3">
+      <label class="md-nav__title" for="nav-1-1-1">
+        <span class="md-nav__icon md-icon"></span>
+        机器学习相关
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-1-1-1" type="checkbox" id="nav-1-1-1-1">
+    
+    <label class="md-nav__link" for="nav-1-1-1-1">
+      安装准备
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="安装准备" data-md-level="4">
+      <label class="md-nav__title" for="nav-1-1-1-1">
+        <span class="md-nav__icon md-icon"></span>
+        安装准备
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../ml/cuda_install/" class="md-nav__link">
+      tensorflow/pytorch 安装准备
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-1-2" type="checkbox" id="nav-1-1-2">
+    
+    <label class="md-nav__link" for="nav-1-1-2">
+      k8s相关
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="k8s相关" data-md-level="3">
+      <label class="md-nav__title" for="nav-1-1-2">
+        <span class="md-nav__icon md-icon"></span>
+        k8s相关
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-1-2-1" type="checkbox" id="nav-1-1-2-1">
+    
+    <label class="md-nav__link" for="nav-1-1-2-1">
+      安装准备
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="安装准备" data-md-level="4">
+      <label class="md-nav__title" for="nav-1-1-2-1">
+        <span class="md-nav__icon md-icon"></span>
+        安装准备
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../../2019/k8s/harbor_install/" class="md-nav__link">
+      在k8s上搭建harbor
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-1-3" type="checkbox" id="nav-1-1-3">
+    
+    <label class="md-nav__link" for="nav-1-1-3">
+      密码学
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="密码学" data-md-level="3">
+      <label class="md-nav__title" for="nav-1-1-3">
+        <span class="md-nav__icon md-icon"></span>
+        密码学
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-1-3-1" type="checkbox" id="nav-1-1-3-1">
+    
+    <label class="md-nav__link" for="nav-1-1-3-1">
+      消息的通讯
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="消息的通讯" data-md-level="4">
+      <label class="md-nav__title" for="nav-1-1-3-1">
+        <span class="md-nav__icon md-icon"></span>
+        消息的通讯
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../crypt/fun_crypt/" class="md-nav__link">
+      现代密码学之消息的通讯
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-2" type="checkbox" id="nav-1-2">
+    
+    <label class="md-nav__link" for="nav-1-2">
+      演讲分享
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="演讲分享" data-md-level="2">
+      <label class="md-nav__title" for="nav-1-2">
+        <span class="md-nav__icon md-icon"></span>
+        演讲分享
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-2-1" type="checkbox" id="nav-1-2-1">
+    
+    <label class="md-nav__link" for="nav-1-2-1">
+      GDG上海分享
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="GDG上海分享" data-md-level="3">
+      <label class="md-nav__title" for="nav-1-2-1">
+        <span class="md-nav__icon md-icon"></span>
+        GDG上海分享
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-2-1-1" type="checkbox" id="nav-1-2-1-1">
+    
+    <label class="md-nav__link" for="nav-1-2-1-1">
+      GDG容器系列课程
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="GDG容器系列课程" data-md-level="4">
+      <label class="md-nav__title" for="nav-1-2-1-1">
+        <span class="md-nav__icon md-icon"></span>
+        GDG容器系列课程
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../../../slides/gdg-shanghai/k8s/ch01/" class="md-nav__link">
+      Docker基础入门
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../../../slides/gdg-shanghai/k8s/ch02/" class="md-nav__link">
+      Docker知识补全
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../../../slides/gdg-shanghai/k8s/ch03/" class="md-nav__link">
+      漫谈K8s
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../../../slides/gdg-shanghai/k8s/ch04/" class="md-nav__link">
+      K8s入门
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../../../slides/gdg-shanghai/k8s/ch05/" class="md-nav__link">
+      K8s实战
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-2-2" type="checkbox" id="nav-1-2-2">
+    
+    <label class="md-nav__link" for="nav-1-2-2">
+      GDG郑州分享
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="GDG郑州分享" data-md-level="3">
+      <label class="md-nav__title" for="nav-1-2-2">
+        <span class="md-nav__icon md-icon"></span>
+        GDG郑州分享
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-1-2-2-1" type="checkbox" id="nav-1-2-2-1">
+    
+    <label class="md-nav__link" for="nav-1-2-2-1">
+      devfest 2019
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="devfest 2019" data-md-level="4">
+      <label class="md-nav__title" for="nav-1-2-2-1">
+        <span class="md-nav__icon md-icon"></span>
+        devfest 2019
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../../../slides/gdg-zhengzhou/devfest2019/apifirst/" class="md-nav__link">
+      API-First Approach to Building Products
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                  <h1>Quick look</h1>
+                
+                <div class="highlight"><pre><span></span><code>pip install apache-superset -i https://mirrors.aliyun.com/pypi/simple/
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>superset version
+superset --version
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>~/.superset/superset.db
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>.schema dbs
+CREATE TABLE IF NOT EXISTS &quot;dbs&quot; (
+    created_on DATETIME NOT NULL, 
+    changed_on DATETIME NOT NULL, 
+    id INTEGER NOT NULL, 
+    database_name VARCHAR(250) NOT NULL, 
+    sqlalchemy_uri VARCHAR(1024) NOT NULL, 
+    created_by_fk INTEGER, 
+    changed_by_fk INTEGER, 
+    password BLOB, 
+    cache_timeout INTEGER, 
+    extra TEXT, 
+    select_as_create_table_as BOOLEAN, 
+    allow_ctas BOOLEAN, 
+    expose_in_sqllab BOOLEAN, 
+    force_ctas_schema VARCHAR(250), 
+    allow_run_async BOOLEAN, 
+    allow_dml BOOLEAN, 
+    perm VARCHAR(1000), 
+    verbose_name VARCHAR(250), 
+    impersonate_user BOOLEAN, 
+    allow_multi_schema_metadata_fetch BOOLEAN, 
+    allow_csv_upload BOOLEAN DEFAULT 1 NOT NULL, 
+    encrypted_extra BLOB, server_cert BLOB, 
+    PRIMARY KEY (id), 
+    CHECK (select_as_create_table_as IN (0, 1)), 
+    CHECK (allow_ctas IN (0, 1)), 
+    CHECK (expose_in_sqllab IN (0, 1)), 
+    CHECK (allow_run_async IN (0, 1)), 
+    CHECK (allow_dml IN (0, 1)), 
+    CHECK (impersonate_user IN (0, 1)), 
+    CHECK (allow_multi_schema_metadata_fetch IN (0, 1)), 
+    CHECK (allow_csv_upload IN (0, 1)), 
+    UNIQUE (database_name), 
+    FOREIGN KEY(created_by_fk) REFERENCES ab_user (id), 
+    FOREIGN KEY(changed_by_fk) REFERENCES ab_user (id)
+);
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>superset db upgrade
+</code></pre></div>
+
+<p>问题<br />
+<div class="highlight"><pre><span></span><code>fabmanager create-admin --app superset
+fabmanager is going to be deprecated in 2.2.X, you can use the same commands on the improved &#39;flask fab &lt;command&gt;&#39;
+Username [admin]: 
+User first name [admin]: 
+User last name [user]: 
+Email [admin@fab.org]: 
+Password: 
+Repeat for confirmation: 
+Traceback (most recent call last):
+  File &quot;/home/dameng/.pyenv/versions/supers/bin/fabmanager&quot;, line 10, in &lt;module&gt;
+    sys.exit(cli())
+  File &quot;/home/dameng/.pyenv/versions/3.7.6/envs/supers/lib/python3.7/site-packages/flask_appbuilder/console.py&quot;, line 422, in cli
+    cli_app()
+  File &quot;/home/dameng/.pyenv/versions/3.7.6/envs/supers/lib/python3.7/site-packages/click/core.py&quot;, line 829, in __call__
+    return self.main(*args, **kwargs)
+  File &quot;/home/dameng/.pyenv/versions/3.7.6/envs/supers/lib/python3.7/site-packages/click/core.py&quot;, line 782, in main
+    rv = self.invoke(ctx)
+  File &quot;/home/dameng/.pyenv/versions/3.7.6/envs/supers/lib/python3.7/site-packages/click/core.py&quot;, line 1259, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File &quot;/home/dameng/.pyenv/versions/3.7.6/envs/supers/lib/python3.7/site-packages/click/core.py&quot;, line 1066, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File &quot;/home/dameng/.pyenv/versions/3.7.6/envs/supers/lib/python3.7/site-packages/click/core.py&quot;, line 610, in invoke
+    return callback(*args, **kwargs)
+  File &quot;/home/dameng/.pyenv/versions/3.7.6/envs/supers/lib/python3.7/site-packages/flask_appbuilder/console.py&quot;, line 137, in create_admin
+    auth_type.get(_appbuilder.sm.auth_type, &quot;No Auth method&quot;)
+AttributeError: &#39;NoneType&#39; object has no attribute &#39;auth_type&#39;
+</code></pre></div></p>
+<div class="highlight"><pre><span></span><code>fabmanager is going to be deprecated in 2.2.X, you can use the same commands on the improved &#39;flask fab &lt;command&gt;&#39;
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>flask fab create-admin
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>select * from ab_user;
+1|admin|user|admin|pbkdf2:sha256:150000$WdqYWjRS$51d35a36a3ccf9cf35a5c8b64c1ba0529756a568c6c5c700913620e8639e4fce|1|admin@fab.org||||2020-08-04 10:48:48.236493|2020-08-04 10:48:48.236503||
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>flask fab list-users 
+List of users
+-------------
+username:admin | email:admin@fab.org | role:[Admin]
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>superset db migrate
+flask fab create-admin
+superset db init
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>flask db stamp head
+flask db migrate
+flask fab create-admin
+</code></pre></div>
+                
+              
+              
+                
+
+
+  <h2 id="__comments">Comments</h2>
+  <div id="disqus_thread"></div>
+  <script>var disqus_config=function(){this.page.url="None",this.page.identifier="None"};window.addEventListener("load",function(){var e=document,i=e.createElement("script");i.src="//pingf.disqus.com/embed.js",i.setAttribute("data-timestamp",+new Date),(e.head||e.body).appendChild(i)})</script>
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../../../../assets/javascripts/vendor.77e55a48.min.js"></script>
+      <script src="../../../../../assets/javascripts/bundle.9554a270.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}</script>
+      
+      <script>
+        app = initialize({
+          base: "../../../../..",
+          features: [],
+          search: Object.assign({
+            worker: "../../../../../assets/javascripts/worker/search.4ac00218.min.js"
+          }, typeof search !== "undefined" && search)
+        })
+      </script>
+      
+    
+  </body>
+</html>
